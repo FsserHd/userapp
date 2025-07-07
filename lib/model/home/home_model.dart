@@ -171,6 +171,7 @@ class VendorData {
   String? discount;
   String? discountType;
   String? upTo;
+  String? vendortype;
   String? openTime;
   String? closeTime;
   GeneralDetail? generalDetail;
@@ -193,7 +194,7 @@ class VendorData {
         this.subtitle,
         this.livestatus,
         this.fcmtoken,
-        this.generalDetail,this.type,this.discount,this.discountType,this.upTo,this.openTime,this.closeTime});
+        this.generalDetail,this.type,this.discount,this.discountType,this.upTo,this.openTime,this.closeTime,this.vendortype});
 
   VendorData.fromJson(Map<String, dynamic> json) {
     vendorId = json['vendor_id'];
@@ -217,6 +218,7 @@ class VendorData {
     livestatus = json['livestatus'];
     fcmtoken = json['fcmtoken'];
     discount = json['discount'];
+    vendortype = json['vendortype'];
     discountType = json['discount_type'];
     upTo = json['upTo'];
     generalDetail = json['general_detail'] != null

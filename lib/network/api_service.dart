@@ -30,6 +30,7 @@ import 'package:userapp/model/service/service_response_model.dart';
 import 'package:userapp/model/tips/tips_model.dart';
 import 'package:userapp/model/vendor/vendor_details_model.dart';
 import 'package:userapp/model/vendor/vendor_model.dart';
+import 'package:userapp/model/vendor/vendor_type_response.dart';
 import 'package:userapp/model/wallet/wallet_balance_response.dart';
 import 'package:userapp/model/wallet/wallet_transcation_model.dart';
 import 'package:userapp/model/zone/zone_information_model.dart';
@@ -849,6 +850,22 @@ class ApiService {
     }
   }
 
+  Future<VendorTypeResponse> listVendorTypes() async {
+    try {
+      String? userId = await PreferenceUtils.getUserId();
+      final response = await dioClient.get(
+          ApiConstants.listvendortype);
+      if (response.statusCode == 200) {
+        return VendorTypeResponse.fromJson(response.data);
+      } else {
+        throw Exception(
+            'Failed to sign in. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error during sign in: $e');
+      throw e;
+    }
+  }
 
 
   final apiServiceProvider = Provider<ApiService>((ref) => ApiService());

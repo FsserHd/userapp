@@ -139,6 +139,7 @@ class _InsideOtpPageState extends StateMVC<InsideOtpPage> {
                 if(verificationCode.length==5){
                   if(_con.otpModel.otp.toString() == verificationCode){
                     PreferenceUtils.saveUserId(widget.id!);
+                    PreferenceUtils.saveUserPhone(widget.mobile);
                     Navigator.pop(context);
                     Navigator.pop(context);
                   }else{

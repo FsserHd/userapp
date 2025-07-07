@@ -48,5 +48,6 @@ class ApiConstants{
   static var createrazorpayorderid = BASE_URL+"createrazorpayorderid/";
   static var appupdate = BASE_URL+"appupdate/";
   static var removeAccount = BASE_URL+"deleteaccount/";
+  static var listvendortype = BASE_URL+"listvendortype";
 
 }

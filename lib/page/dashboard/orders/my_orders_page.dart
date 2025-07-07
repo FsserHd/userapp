@@ -1,5 +1,7 @@
 
 
+import 'dart:async';
+
 import 'package:basic_utils/basic_utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,6 +10,7 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 import 'package:userapp/constants/api_constants.dart';
 import 'package:userapp/constants/app_colors.dart';
 import 'package:userapp/flutter_flow/flutter_flow_theme.dart';
+import 'package:userapp/model/order/order_model.dart';
 import 'package:userapp/navigation/page_navigation.dart';
 import 'package:userapp/utils/time_utils.dart';
 import 'package:userapp/utils/validation_utils.dart';
@@ -41,6 +44,30 @@ class _MyOrderPageState extends StateMVC<MyOrderPage> {
     });
   }
 
+  DateTime? cookingEndTime;
+  late Timer _timer;
+
+  void _startTimer(DateTime cookingEndTime, Data orderBean) {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        orderBean.remainingTime = cookingEndTime.difference(DateTime.now());
+        orderBean.isCooking = true;
+        if (orderBean.remainingTime.isNegative) {
+          timer.cancel();
+          orderBean.isCooking = false;
+        }
+      });
+
+    });
+  }
+
+  String formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,6 +78,10 @@ class _MyOrderPageState extends StateMVC<MyOrderPage> {
             shrinkWrap: true,
             itemBuilder: (context,index){
             var orderBean = _con.orderModel.data![index];
+            if(orderBean.cookingtime!="" && orderBean.cookingtime!.isNotEmpty) {
+              cookingEndTime = DateTime.parse(orderBean.cookingtime!);
+              _startTimer(cookingEndTime!,orderBean);
+            }
           return  InkWell(
             onTap: (){
               PageNavigation.gotoOrderDetailsPage(context,orderBean.saleCode!);
@@ -239,9 +270,18 @@ class _MyOrderPageState extends StateMVC<MyOrderPage> {
                         ],
                       ),
                       SizedBox(height: 5,),
-                      Text(
-                        "OTP: ${orderBean.otp}",
-                        style: AppStyle.font18BoldWhite.override(fontSize: 14,color: AppColors.themeColor),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "OTP: ${orderBean.otp}",
+                            style: AppStyle.font18BoldWhite.override(fontSize: 14,color: AppColors.themeColor),
+                          ),
+                          orderBean.deliveryState== "on_track" && orderBean.isCooking == true ? Text(
+                            'Prepare Time: ${formatDuration(orderBean.remainingTime)}',
+                            style: TextStyle(fontSize: 12, color: Colors.red),
+                          ):Container(),
+                        ],
                       ),
                     ],
                   ),

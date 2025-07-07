@@ -30,17 +30,34 @@ class _HomePageState extends StateMVC<HomePage> {
     _con = controller as HomeController;
   }
 
+  int? selectedIndex;
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _con.homeData(context);
-
+    _con.listVendorTypes();
   }
 
   Future<void> openLink(String url) async {
     final String webUrl = url;
     await launchUrl(Uri.parse(webUrl));
+  }
+
+  void scrollToBottom() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose(); // Always dispose controllers
+    super.dispose();
   }
 
 
@@ -169,9 +186,71 @@ class _HomePageState extends StateMVC<HomePage> {
               );
             }),
             Image.asset("assets/images/near.png",),
-            SizedBox(height: 20,),
+            SizedBox(height: 10,),
+            Container(
+              height: 40,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _con.vendorTypeList.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  var bean = _con.vendorTypeList[index];
+                  bool isSelected = selectedIndex == index;
+
+                  return Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          selectedIndex = index;
+                          _con.filterVendor(bean.id!,"filter");
+                          scrollToBottom();
+                        });
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.themeColor : Colors.transparent,
+                          border: Border.all(
+                            color: AppColors.themeColor,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              bean.name!,
+                              style: AppStyle.font18BoldWhite.override(
+                                fontSize: 14,
+                                color: isSelected ? Colors.white : AppColors.themeColor,
+                              ),
+                            ),
+                            if (isSelected)
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedIndex = null;
+                                    _con.filterVendor(bean.id!,"clear");
+                                    scrollToBottom();
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: Icon(Icons.close, color: Colors.white, size: 16),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 10,),
             ListView.builder(
-              physics: NeverScrollableScrollPhysics(),
+              controller: _scrollController, // Attach controller
               shrinkWrap: true,
               itemCount: _con.vendorList.length,
                 itemBuilder: (context,index){

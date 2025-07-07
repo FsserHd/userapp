@@ -35,6 +35,7 @@ import '../model/category/category_model.dart';
 import '../model/home/home_model.dart';
 import '../model/product/grocery_product_model.dart';
 import '../model/vendor/vendor_model.dart';
+import '../model/vendor/vendor_type_response.dart';
 import '../navigation/page_navigation.dart';
 import '../network/api_service.dart';
 import '../network/dio_client.dart';
@@ -58,6 +59,7 @@ class HomeController extends ControllerMVC{
   var productModel = ProductModel();
   var profileModel = ProfileModel();
   var chatResponse = ChatResponse();
+  List<VendorType> vendorTypeList = [];
   var chatRequest = ChatRequest();
   var groceryProductModel = GroceryProductModel();
   var groceryCategoryModel = GroceryCategoryModel();
@@ -72,6 +74,20 @@ class HomeController extends ControllerMVC{
   LatLng? shippingAddress;
   List<VendorData> vendorList = [];
   final Set<Polyline> polylines = {};
+
+  filterVendor(String s,String action){
+    vendorList.clear();
+    if(action != "clear"){
+      homeModel.data!.vendor!.forEach((e){
+        if(s == e.vendortype){
+          vendorList.add(e);
+        }
+      });
+    }else{
+      vendorList.addAll(homeModel.data!.vendor!);
+    }
+    notifyListeners();
+  }
 
   getAllCount(){
     dbHelper.getCartCount().then((value){
@@ -924,6 +940,22 @@ class HomeController extends ControllerMVC{
       polyline.add(LatLng(lat / 1E5, lng / 1E5));
     }
     return polyline;
+  }
+
+  listVendorTypes(){
+    Loader.show();
+    apiService.listVendorTypes().then((value){
+      Loader.hide();
+      if(value.success!){
+        vendorTypeList = value.data!;
+      }else{
+        //ValidationUtils.showAppToast("Something wrong");
+      }
+      notifyListeners();
+    }).catchError((e){
+      print(e);
+      Loader.hide();
+    });
   }
 
 

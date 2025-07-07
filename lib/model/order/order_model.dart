@@ -47,9 +47,12 @@ class Data {
   String? deliveryState;
   String? deliveryAssigned;
   String? otp;
+  String? cookingtime;
   String? rating;
   Vendor? vendor;
   String? shopTypeId;
+  Duration remainingTime = Duration();
+  bool isCooking = false;
 
   Data(
       {this.userid,
@@ -68,7 +71,7 @@ class Data {
         this.otp,
         this.rating,
         this.vendor,
-        this.shopTypeId,this.logo,this.deliveryAssigned,this.deliveryState});
+        this.shopTypeId,this.logo,this.deliveryAssigned,this.deliveryState,this.cookingtime});
 
   Data.fromJson(Map<String, dynamic> json) {
     userid = json['userid'];
@@ -83,6 +86,7 @@ class Data {
         ? new ShippingAddress.fromJson(json['shipping_address'])
         : null;
     shipping = json['shipping'];
+    cookingtime = json['cooking_time'];
     paymentType = json['payment_type'];
     paymentStatus = json['payment_status'];
     paymentTimestamp = json['payment_timestamp'];

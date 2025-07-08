@@ -185,6 +185,7 @@ class HomeController extends ControllerMVC{
             //     return a.distance1!.compareTo(b.distance1!);
             // });
             await Future.wait(futures); // Wait for all async operations to complete.
+            listVendorTypes();
           notifyListeners();
         } else {
          // ValidationUtils.showAppToast("Something wrong");
@@ -942,21 +943,31 @@ class HomeController extends ControllerMVC{
     return polyline;
   }
 
-  listVendorTypes(){
+  listVendorTypes() {
     Loader.show();
-    apiService.listVendorTypes().then((value){
+    apiService.listVendorTypes().then((value) {
       Loader.hide();
-      if(value.success!){
+      if (value.success!) {
         vendorTypeList = value.data!;
-      }else{
+
+        // Count how many vendors match each vendor type
+        vendorTypeList.forEach((element) {
+          int count = vendorList.where((e) => e.vendortype == element.id).length;
+          element.count = count;
+        });
+
+        // Remove items where count == 0
+        vendorTypeList.removeWhere((element) => element.count == 0);
+      } else {
         //ValidationUtils.showAppToast("Something wrong");
       }
       notifyListeners();
-    }).catchError((e){
+    }).catchError((e) {
       print(e);
       Loader.hide();
     });
   }
+
 
 
 }

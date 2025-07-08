@@ -852,9 +852,9 @@ class ApiService {
 
   Future<VendorTypeResponse> listVendorTypes() async {
     try {
-      String? userId = await PreferenceUtils.getUserId();
+      String? userId = await PreferenceUtils.getZoneId();
       final response = await dioClient.get(
-          ApiConstants.listvendortype);
+          ApiConstants.listvendortype+"/$userId");
       if (response.statusCode == 200) {
         return VendorTypeResponse.fromJson(response.data);
       } else {

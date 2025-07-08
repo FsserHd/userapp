@@ -38,7 +38,7 @@ class _HomePageState extends StateMVC<HomePage> {
     // TODO: implement initState
     super.initState();
     _con.homeData(context);
-    _con.listVendorTypes();
+
   }
 
   Future<void> openLink(String url) async {
@@ -220,7 +220,7 @@ class _HomePageState extends StateMVC<HomePage> {
                         child: Row(
                           children: [
                             Text(
-                              bean.name!,
+                              bean.name!+" ("+bean.count.toString()+")",
                               style: AppStyle.font18BoldWhite.override(
                                 fontSize: 14,
                                 color: isSelected ? Colors.white : AppColors.themeColor,

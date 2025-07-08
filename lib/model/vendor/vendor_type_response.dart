@@ -33,6 +33,7 @@ class VendorTypeResponse {
 class VendorType {
   String? id;
   String? name;
+  int? count = 0;
   String? createdAt;
 
   VendorType({this.id, this.name, this.createdAt});

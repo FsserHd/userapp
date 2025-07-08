@@ -129,6 +129,7 @@ class Variant {
   String? image;
   int? numOfImgs;
   String? salePrice;
+  String? strikePrice;
   String? type;
   bool? selected;
   String? foodType;
@@ -150,7 +151,7 @@ class Variant {
         this.type,
         this.selected,
         this.foodType,
-        this.packingCharge,this.tax});
+        this.packingCharge,this.tax,this.strikePrice});
 
   Variant.fromJson(Map<String, dynamic> json) {
     variantId = json['variant_id'];
@@ -164,6 +165,7 @@ class Variant {
     image = json['image'];
     numOfImgs = json['num_of_imgs'];
     salePrice = json['sale_price'];
+    strikePrice = json['strike_price'];
 
     type = json['type'];
     selected = json['selected'];
@@ -183,6 +185,7 @@ class Variant {
     data['image'] = this.image;
     data['num_of_imgs'] = this.numOfImgs;
     data['sale_price'] = this.salePrice;
+    data['strike_price'] = this.strikePrice;
     data['type'] = this.type;
     data['selected'] = this.selected;
     data['foodType'] = this.foodType;

@@ -176,7 +176,7 @@ class _ProductPageState extends StateMVC<ProductPage> {
                               _con.cartProductModel.price =
                                   productBean.variant![0].salePrice;
                               _con.cartProductModel.strike =
-                                  productBean.variant![0].salePrice;
+                                  productBean.variant![0].strikePrice;
                               _con.cartProductModel.offer = 0;
                               _con.cartProductModel.quantity = "0";
                               _con.cartProductModel.qty = productBean.qty! + 1;

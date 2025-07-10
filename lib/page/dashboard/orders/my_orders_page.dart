@@ -263,10 +263,7 @@ class _MyOrderPageState extends StateMVC<MyOrderPage> {
                             "Payment mode: ${orderBean.paymentType!.toUpperCase()}",
                             style: AppStyle.font18BoldWhite.override(fontSize: 12,color: Colors.orange),
                           ),
-                          Text(
-                            TimeUtils.getTimeStampToDate(int.parse(orderBean.paymentTimestamp!)),
-                            style: AppStyle.font14RegularBlack87.override(fontSize: 10,color: Colors.grey),
-                          ),
+
                         ],
                       ),
                       SizedBox(height: 5,),

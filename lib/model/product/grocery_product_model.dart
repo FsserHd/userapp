@@ -105,6 +105,7 @@ class GroceryVariant {
   String? unit;
   String? salePrice;
   String? strikePrice;
+  String? purchasePrice;
   String? discount;
   int? packingCharge;
   double? tax;
@@ -125,7 +126,7 @@ class GroceryVariant {
         this.tax,
         this.type,
         this.selected,
-        this.image,this.qty});
+        this.image,this.qty,this.purchasePrice});
 
   GroceryVariant.fromJson(Map<String, dynamic> json) {
     variantId = json['variant_id'];
@@ -143,6 +144,7 @@ class GroceryVariant {
     selected = json['selected'];
     qty = json['qty'];
     image = json['image'];
+    purchasePrice = json['purchase_price'];
   }
 
   Map<String, dynamic> toJson() {
@@ -154,6 +156,7 @@ class GroceryVariant {
     data['unit'] = this.unit;
     data['sale_price'] = this.salePrice;
     data['strike_price'] = this.strikePrice;
+    data['purchase_price'] = this.purchasePrice;
     data['discount'] = this.discount;
     data['packingCharge'] = this.packingCharge;
     data['tax'] = this.tax;

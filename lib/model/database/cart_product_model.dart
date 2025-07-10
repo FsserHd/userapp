@@ -5,6 +5,7 @@ class CartProductModel {
   String? productName;
   String? price;
   String? strike;
+  String? purchasePrice;
   int? offer;
   String? quantity;
   int? qty;
@@ -37,13 +38,14 @@ class CartProductModel {
         this.image,
         this.tax,
         this.discount,
-        this.packingCharge,this.addon});
+        this.packingCharge,this.addon,this.purchasePrice});
 
   CartProductModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     productName = json['product_name'];
     price = json['price'];
     strike = json['strike'];
+    purchasePrice = json['purchase_price'];
     offer = json['offer'];
     quantity = json['quantity'];
     qty = json['qty'];
@@ -66,6 +68,7 @@ class CartProductModel {
     data['product_name'] = this.productName;
     data['price'] = this.price;
     data['strike'] = this.strike;
+    data['purchase_price'] = this.purchasePrice;
     data['offer'] = this.offer;
     data['quantity'] = this.quantity;
     data['qty'] = this.qty;

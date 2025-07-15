@@ -600,8 +600,8 @@ class _OrderDetailsPageState extends StateMVC<OrderDetailsPage> {
                                   children: [
                                     Row(
                                       children: [
-                                        Image.asset("assets/images/non_veg.png",height: 12,width: 12,),
-                                        SizedBox(width: 5,),
+                                       // Image.asset("assets/images/non_veg.png",height: 12,width: 12,),
+                                       // SizedBox(width: 5,),
                                         Row(
                                           children: [
                                             Text(productBean.qty.toString()+"x",style  : AppStyle.font14MediumBlack87.override(fontSize: 13,color: Colors.grey),),

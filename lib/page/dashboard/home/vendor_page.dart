@@ -67,10 +67,10 @@ class _VendorPageState extends StateMVC<VendorPage> {
                     style: AppStyle.font18BoldWhite.override(fontSize: 16),
                   ),
                   SizedBox(height: 2,),
-                  Text(
-                    "Fast on authentic ${widget.categoryBean.title}",
-                    style: AppStyle.font18BoldWhite.override(fontSize: 12,color: Colors.grey),
-                  ),
+                  // Text(
+                  //   "Fast on authentic ${widget.categoryBean.title}",
+                  //   style: AppStyle.font18BoldWhite.override(fontSize: 12,color: Colors.grey),
+                  // ),
                 ],
               ),
             ),
@@ -105,7 +105,7 @@ class _VendorPageState extends StateMVC<VendorPage> {
                           context, vendorBean.vendorId, vendorBean);
                     }
                   }else{
-                    ValidationUtils.showAppToast("The restaurant is currently not accepting online orders. ");
+                    ValidationUtils.showAppToast("The shop is currently not accepting online orders. ");
                   }
                 },
                 child: vendorBean.livestatus == "true" ? Padding(

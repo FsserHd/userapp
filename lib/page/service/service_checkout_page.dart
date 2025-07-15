@@ -78,7 +78,11 @@ class _ServiceCheckOutPageState extends StateMVC<ServiceCheckOutPage> {
     _con.getDistance2(widget.addServiceRequest.fLatitude!, widget.addServiceRequest.fLongitude!, widget.addServiceRequest.tLatitude!, widget.addServiceRequest.tLongitude!).then((value){
       setState(() {
         distance = value;
-        _con.getServiceDeliveryFees(context, distance!,widget.selectedCategory!.maincategory);
+        if(widget.selectedCategory == null){
+          _con.getServiceDeliveryFees(context, distance!,"1");
+        }else{
+          _con.getServiceDeliveryFees(context, distance!,widget.selectedCategory!.maincategory);
+        }
       });
     });
   }
@@ -370,7 +374,12 @@ class _ServiceCheckOutPageState extends StateMVC<ServiceCheckOutPage> {
                       //widget.addServiceRequest.types = widget.selectCategoryList.join(",");
                       widget.addServiceRequest.types = widget.serviceInput;
                       widget.addServiceRequest.paymentMode = paymentMode;
-                      widget.addServiceRequest.maincategory = widget.selectedCategory!.maincategory;
+                      if(widget.selectedCategory == null){
+                        widget.addServiceRequest.maincategory = "1";
+                      }else{
+                        widget.addServiceRequest.maincategory = widget.selectedCategory!.maincategory;
+                      }
+
                       //     .map((category) => category.id)
                       //     .where((id) => id != null)
                       //     .join(',');

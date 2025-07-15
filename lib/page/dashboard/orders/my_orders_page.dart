@@ -225,8 +225,8 @@ class _MyOrderPageState extends StateMVC<MyOrderPage> {
                                     padding: const EdgeInsets.all(3.0),
                                     child: Row(
                                       children: [
-                                        Image.asset("assets/images/non_veg.png",height: 12,width: 12,),
-                                        SizedBox(width: 5,),
+                                       // Image.asset("assets/images/non_veg.png",height: 12,width: 12,),
+                                       // SizedBox(width: 5,),
                                         Row(
                                           children: [
                                             Text(productBean.qty.toString()+"x",style  : AppStyle.font14MediumBlack87.override(fontSize: 10,color: Colors.grey),),

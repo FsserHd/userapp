@@ -104,7 +104,7 @@ class _SearchPageState extends StateMVC<SearchPage> {
                                         context, vendorBean.vendorId, vendorBean);
                                   }
                                 }else{
-                                  ValidationUtils.showAppToast("The restaurant is currently not accepting online orders. ");
+                                  ValidationUtils.showAppToast("The shop is currently not accepting online orders. ");
                                 }
                               },
                               child: vendorBean.livestatus == "true" ? Padding(

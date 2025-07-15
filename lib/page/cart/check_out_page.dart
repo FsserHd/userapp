@@ -332,7 +332,7 @@ class _CheckOutPageState extends StateMVC<CheckOutPage> with SingleTickerProvide
                                       width: 1.0,
                                     ),
                                   ),
-                                  hintText: 'Write instruction restaurants',
+                                  hintText: 'Write instruction',
                                   hintStyle: AppStyle.font14MediumBlack87.override(color: Colors.black,fontSize: 12),
                                   prefixIcon: Icon(Icons.message,color: Colors.red,size: 16,), // Add the icon inside the TextField
                                 ),

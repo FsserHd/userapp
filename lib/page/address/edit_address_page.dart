@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/geocoding.dart';
@@ -48,14 +49,22 @@ class _EditAddressPageState extends StateMVC<EditAddressPage> {
       _selectedPosition = position;
       _con.serviceCheckZone(context, position.latitude.toString(), position.longitude.toString());
     });
-    final geocodingResponse = await _geocoding.searchByLocation(
-      Location(lat: position.latitude, lng: position.longitude),
-    );
+    try {
+      // Get the address using the geocoding package
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
 
-    if (geocodingResponse.results.isNotEmpty) {
-      setState(() {
-        _address = geocodingResponse.results.first.formattedAddress ?? '';
-      });
+      // If the placemark is found, update the address
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        setState(() {
+          _address = "${place.street}, ${place.locality}, ${place.country}";
+        });
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -233,14 +242,22 @@ class _EditAddressPageState extends StateMVC<EditAddressPage> {
       ),
     );
 
-    final geocodingResponse = await _geocoding.searchByLocation(
-      Location(lat: position.latitude, lng: position.longitude),
-    );
+    try {
+      // Get the address using the geocoding package
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
 
-    if (geocodingResponse.results.isNotEmpty) {
-      setState(() {
-        _address = geocodingResponse.results.first.formattedAddress ?? '';
-      });
+      // If the placemark is found, update the address
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        setState(() {
+          _address = "${place.street}, ${place.locality}, ${place.country}";
+        });
+      }
+    } catch (e) {
+      print(e);
     }
   }
 

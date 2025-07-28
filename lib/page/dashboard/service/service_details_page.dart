@@ -131,7 +131,7 @@ class _ServiceDetailsPageState extends StateMVC<ServiceDetailsPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "Order is ${widget.serviceBean.deliveryStatus!}",
+                              "Order is ${widget.serviceBean.deliveryStatus=="Rejected" ? "Placed" :widget.serviceBean.deliveryStatus!}",
                               maxLines: 1,overflow: TextOverflow.ellipsis,
                               style: AppStyle.font18BoldWhite.override(fontSize: 16,color: Colors.white),
                             ),

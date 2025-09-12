@@ -191,7 +191,7 @@ class HomeController extends ControllerMVC{
          // ValidationUtils.showAppToast("Something wrong");
         }
       }).catchError((e) {
-        print(e);
+        print("Home Data error"+e);
         Loader.hide();
       });
     }else{

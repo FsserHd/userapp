@@ -38,7 +38,6 @@ class _HomePageState extends StateMVC<HomePage> {
     // TODO: implement initState
     super.initState();
     _con.homeData(context);
-
   }
 
   Future<void> openLink(String url) async {
@@ -175,7 +174,7 @@ class _HomePageState extends StateMVC<HomePage> {
                             borderRadius: BorderRadius.circular(8.0), // Rounded corners for inner container
                           ),
                           padding: EdgeInsets.all(10.0), // Padding for icon
-                          child: Image.network(categoryBean.coverImage!,height: 30,width: 30,color: Colors.white,),
+                          child: Image.network(categoryBean.coverImage!,height: 30,width: 30,),
                         ),
                       ),
                       SizedBox(height: 10,),
@@ -416,8 +415,8 @@ class _HomePageState extends StateMVC<HomePage> {
                                     ),
                                     SizedBox(width: 10,),
                                     Text(vendorBean.distance!.toString(),style  : AppStyle.font14MediumBlack87.override(fontSize: 12),),
-                                    SizedBox(width: 10,),
-                                    Text(_con.duration,style  : AppStyle.font14MediumBlack87.override(fontSize: 12),),
+                                    // SizedBox(width: 10,),
+                                    // Text(_con.duration,style  : AppStyle.font14MediumBlack87.override(fontSize: 12),),
                                   ],
                                 ),
                                 SizedBox(height: 5,),

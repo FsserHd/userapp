@@ -9,6 +9,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:userapp/controller/cart_controller.dart';
 import 'package:userapp/controller/home_controller.dart';
+import 'package:userapp/model/hotel/booking_request.dart';
+import 'package:userapp/model/hotel/hotel_booking_response.dart';
+import 'package:userapp/model/hotel/hotel_details_response.dart';
+import 'package:userapp/model/hotel/hotel_response.dart';
 import 'package:userapp/model/order/order_model.dart';
 import 'package:userapp/model/service/add_service_request.dart';
 import 'package:userapp/model/service/service_category_model.dart';
@@ -27,6 +31,13 @@ import 'package:userapp/page/dashboard/orders/order_details_page.dart';
 import 'package:userapp/page/dashboard/service/service_details_page.dart';
 import 'package:userapp/page/grocery/grocery_category_page.dart';
 import 'package:userapp/page/grocery/grocery_product_page.dart';
+import 'package:userapp/page/hotel/hotel_booking_screen.dart';
+import 'package:userapp/page/hotel/hotel_checkout_page.dart';
+import 'package:userapp/page/hotel/hotel_my_booking_details_page.dart';
+import 'package:userapp/page/hotel/hotel_room_page.dart';
+import 'package:userapp/page/hotel/hotel_success_page.dart';
+import 'package:userapp/page/hotel/hotel_vendor_details_page.dart';
+import 'package:userapp/page/hotel/hotel_vendors_page.dart';
 import 'package:userapp/page/location/location_page.dart';
 import 'package:userapp/page/location/select_location_page.dart';
 import 'package:userapp/page/payment/payment_page.dart';
@@ -47,6 +58,7 @@ import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 import '../page/address/map_page.dart';
 import '../page/dashboard/home/vendor_page.dart';
+import '../page/hotel/hotel_my_booking_page.dart';
 import '../page/service/service_category_page.dart';
 
 class PageNavigation{
@@ -186,7 +198,7 @@ class PageNavigation{
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MapPage(),
+        builder: (context) => MapPage(""),
       ),
     );
   }
@@ -245,11 +257,11 @@ class PageNavigation{
     );
   }
 
-  static Future<dynamic> gotoMapServiceLocation(BuildContext context, String type) async {
+  static Future<dynamic> gotoMapServiceLocation(BuildContext context, String type, String serviceType) async {
     return Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ServiceLocationPage(type),
+        builder: (context) => ServiceLocationPage(type,serviceType),
       ),
     );
   }
@@ -334,6 +346,79 @@ class PageNavigation{
       ),
     );
   }
+
+  static gotoHotelBookingPage(BuildContext context){
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HotelBookingScreen(),
+      ),
+    );
+  }
+
+  static gotoHotelVendorPage(BuildContext context, BookingRequest bookingRequest){
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HotelVendorsPage(bookingRequest),
+      ),
+    );
+  }
+
+  static gotoHotelVendorDetailsPage(BuildContext context, hotelBean, BookingRequest bookingRequest){
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HotelVendorDetailsPage(hotelBean,bookingRequest),
+      ),
+    );
+  }
+
+  static gotoHotelRoomPage(BuildContext context,hotelData,roomBean, BookingRequest bookingRequest){
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HotelRoomPage(hotelData,roomBean,bookingRequest),
+      ),
+    );
+  }
+
+  static gotoHotelCheckoutPage(BuildContext context,hotelData,roomBean, BookingRequest bookingRequest){
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HotelCheckoutPage(hotelData,roomBean,bookingRequest),
+      ),
+    );
+  }
+
+  static gotoHotelSuccessPage(BuildContext context){
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HotelSuccessPage(),
+      ),
+    );
+  }
+
+  static gotoHotelMyBookings(BuildContext context){
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HotelMyBookingPage(),
+      ),
+    );
+  }
+
+  static gotoHotelMyBookingDetails(BuildContext context, bookingBean){
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HotelMyBookingDetailsPage(bookingBean),
+      ),
+    );
+  }
+
 
   static gotoDialPage(BuildContext context,String mobile) async {
     await FlutterPhoneDirectCaller.callNumber(mobile);

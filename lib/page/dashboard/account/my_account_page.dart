@@ -136,6 +136,38 @@ class _MyAccountPageState extends StateMVC<MyAccountPage> {
                           ),
                         ),
                       ),
+                      InkWell(
+                        onTap: (){
+                          PageNavigation.gotoHotelMyBookings(context);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Color(0XFFF7F7F7),
+                              border: Border.all(
+                                color:Color(0XFFF7F7F7),
+                                width: 0,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.meeting_room_sharp,color: AppColors.themeColor,),
+                                  SizedBox(width: 5,),
+                                  Text(
+                                    'My Rooms',
+                                    style: AppStyle.font14MediumBlack87.override(color: Colors.black,fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                       // InkWell(
                       //   onTap: (){
                       //     PageNavigation.gotoPolicyPage(context);

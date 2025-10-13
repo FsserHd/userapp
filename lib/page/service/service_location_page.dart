@@ -17,7 +17,8 @@ import '../../controller/address_controller.dart';
 
 class ServiceLocationPage extends StatefulWidget {
   String type;
-  ServiceLocationPage(this.type, {super.key});
+  String serviceType;
+  ServiceLocationPage(this.type, this.serviceType, {super.key});
 
   @override
   _ServiceLocationPageState createState() => _ServiceLocationPageState();
@@ -51,7 +52,7 @@ class _ServiceLocationPageState extends StateMVC<ServiceLocationPage> {
       _con.request.fLongitude = position.longitude.toString();
       if(widget.type == "from") {
         _con.serviceCheckZone(context, position.latitude.toString(),
-            position.longitude.toString());
+            position.longitude.toString(),widget.serviceType);
       }
     });
 
@@ -165,7 +166,7 @@ class _ServiceLocationPageState extends StateMVC<ServiceLocationPage> {
       _con.request.fLongitude = currentLongitude.toString();
        if(widget.type == "from") {
          _con.serviceCheckZone(context, currentLatitude.toString(),
-             currentLongitude.toString());
+             currentLongitude.toString(),widget.serviceType);
        }
     });
 

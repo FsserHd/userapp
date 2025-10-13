@@ -16,7 +16,8 @@ import '../../controller/address_controller.dart';
 
 class EditAddressPage extends StatefulWidget {
   Data addressBean;
-  EditAddressPage(this.addressBean, {super.key});
+  String type;
+  EditAddressPage(this.addressBean, this.type, {super.key});
 
   @override
   _EditAddressPageState createState() => _EditAddressPageState();
@@ -47,7 +48,7 @@ class _EditAddressPageState extends StateMVC<EditAddressPage> {
   void _onMapTapped(LatLng position) async {
     setState(() {
       _selectedPosition = position;
-      _con.serviceCheckZone(context, position.latitude.toString(), position.longitude.toString());
+      _con.serviceCheckZone(context, position.latitude.toString(), position.longitude.toString(),widget.type);
     });
     try {
       // Get the address using the geocoding package
@@ -230,7 +231,7 @@ class _EditAddressPageState extends StateMVC<EditAddressPage> {
     setState(() {
       _initialPosition = LatLng(position.latitude, position.longitude);
       _selectedPosition = _initialPosition;
-      _con.serviceCheckZone(context, position.latitude.toString(), position.longitude.toString());
+      _con.serviceCheckZone(context, position.latitude.toString(), position.longitude.toString(),widget.type);
     });
 
     mapController.animateCamera(

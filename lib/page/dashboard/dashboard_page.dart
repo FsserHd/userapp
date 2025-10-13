@@ -452,8 +452,8 @@ class _DashboardPageState extends StateMVC<DashboardPage>  with WidgetsBindingOb
               label: 'Service',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Account',
+              icon: Icon(Icons.more_horiz_sharp),
+              label: 'More',
             ),
           ],
         ),

@@ -92,7 +92,7 @@ class _AddressPageState extends StateMVC<AddressPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MapPage(),
+                            builder: (context) => MapPage(widget.type),
                           ),
                         ).then((value){
                           _con.listAddress(context);
@@ -190,7 +190,7 @@ class _AddressPageState extends StateMVC<AddressPage> {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) => EditAddressPage(addressBean),
+                                              builder: (context) => EditAddressPage(addressBean,widget.type),
                                             ),
                                           ).then((value){
                                             _con.listAddress(context);

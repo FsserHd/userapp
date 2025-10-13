@@ -390,7 +390,7 @@ class _AddServicePageState extends StateMVC<AddServicePage> {
               height: 52,
               child: GestureDetector(
                 onTap: () {
-                 PageNavigation.gotoMapServiceLocation(context,"from").then((value){
+                 PageNavigation.gotoMapServiceLocation(context,"from","service").then((value){
                   setState(() {
                    // print("xxxxxxxx"+value);
                     request = value;
@@ -550,7 +550,7 @@ class _AddServicePageState extends StateMVC<AddServicePage> {
                   height: 52,
                   child: GestureDetector(
                     onTap: () {
-                      PageNavigation.gotoMapServiceLocation(context,"to").then((value){
+                      PageNavigation.gotoMapServiceLocation(context,"to","service").then((value){
                         setState(() {
                           request = value;
                           deliveryLocation  = request.fromlocation!;

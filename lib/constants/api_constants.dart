@@ -2,9 +2,14 @@
 
 class ApiConstants{
   static var BASE_URL = "https://thee4square.com/api/index.php/api/";
+  static var HOTEL_BASE_URL = "https://hotel.thee4square.in/mobileapi/";
   static var WEB_BASE_URL = "https://thee4square.com/";
   static var IMG_BASE_URL = "https://thee4square.com/api/index.php/api_vendor/";
   static var currency = "₹";
+
+  static var amenities = ["","Free Wi-Fi","Swimming Pool","Fitness Center","Restaurant",
+  "Spa","Room Service","Parking","Air Conditioning","24-Hour Front Desk","Pet-Friendly","Business Center","Safety Deposit Box"];
+
   static var login = BASE_URL+"login";
   static var validation = BASE_URL+"Validation/";
   static var homeData = BASE_URL+"homeData/";
@@ -49,5 +54,17 @@ class ApiConstants{
   static var appupdate = BASE_URL+"appupdate/";
   static var removeAccount = BASE_URL+"deleteaccount/";
   static var listvendortype = BASE_URL+"listvendortype";
+
+
+  //Hotel Api's
+
+  static var hotellist = HOTEL_BASE_URL+"hotellist";
+  static var hoteldetails = HOTEL_BASE_URL+"hoteldetails";
+  static var searchtimeslot = HOTEL_BASE_URL+"searchtimeslot";
+  static var submitbooking = HOTEL_BASE_URL+"submitbooking";
+  static var mybooking = HOTEL_BASE_URL+"mybooking";
+  static var bookingdetails = HOTEL_BASE_URL+"bookingdetails";
+  static var getzoneid = HOTEL_BASE_URL+"getzoneid/";
+
 
 }

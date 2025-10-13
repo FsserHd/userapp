@@ -137,57 +137,112 @@ class AddressController extends ControllerMVC{
 
   checkZone(BuildContext context,String latitude,String longitude, Data addressBean, String type){
     Loader.show();
-    apiService.getZone(latitude,longitude).then((value){
-      Loader.hide();
-      if(value.success!){
-        zoneResponseModel = value;
-        if(zoneResponseModel.data == "no_matched"){
-          ValidationUtils.showAppToast("Unfortunately, we do not provide service at that location at this time.");
-        }else{
-          PreferenceUtils.saveZoneId(zoneResponseModel.data!);
-          PreferenceUtils.saveLocation(addressBean.address!);
-          PreferenceUtils.saveLatitude(addressBean.latitude!);
-          PreferenceUtils.saveLongitude(addressBean.longitude!);
-          if(type=="home"){
-          PageNavigation.gotoDashboard(context);
+    if(type == "hotel"){
+      apiService.getHotelZone(latitude,longitude).then((value){
+        Loader.hide();
+        if(value.success!){
+          zoneResponseModel = value;
+          if(zoneResponseModel.data == "no_matched"){
+            ValidationUtils.showAppToast("Unfortunately, we do not provide service at that location at this time.");
           }else{
-            Navigator.pop(context,addressBean.address);
+            PreferenceUtils.saveZoneId(zoneResponseModel.data!);
+            PreferenceUtils.saveLocation(addressBean.address!);
+            PreferenceUtils.saveLatitude(addressBean.latitude!);
+            PreferenceUtils.saveLongitude(addressBean.longitude!);
+            if(type=="home"){
+              PageNavigation.gotoDashboard(context);
+            }else{
+              Navigator.pop(context,addressBean.address);
+            }
           }
+          notifyListeners();
+        }else{
+          //ValidationUtils.showAppToast("Something wrong");
         }
-        notifyListeners();
-      }else{
-        //ValidationUtils.showAppToast("Something wrong");
-      }
-    }).catchError((e){
-      print(e);
-      Loader.hide();
-    });
+      }).catchError((e){
+        print(e);
+        Loader.hide();
+      });
+    }else{
+      apiService.getZone(latitude,longitude).then((value){
+        Loader.hide();
+        if(value.success!){
+          zoneResponseModel = value;
+          if(zoneResponseModel.data == "no_matched"){
+            ValidationUtils.showAppToast("Unfortunately, we do not provide service at that location at this time.");
+          }else{
+            PreferenceUtils.saveZoneId(zoneResponseModel.data!);
+            PreferenceUtils.saveLocation(addressBean.address!);
+            PreferenceUtils.saveLatitude(addressBean.latitude!);
+            PreferenceUtils.saveLongitude(addressBean.longitude!);
+            if(type=="home"){
+              PageNavigation.gotoDashboard(context);
+            }else{
+              Navigator.pop(context,addressBean.address);
+            }
+          }
+          notifyListeners();
+        }else{
+          //ValidationUtils.showAppToast("Something wrong");
+        }
+      }).catchError((e){
+        print(e);
+        Loader.hide();
+      });
+    }
+
   }
 
-  serviceCheckZone(BuildContext context,String latitude,String longitude){
+  serviceCheckZone(BuildContext context,String latitude,String longitude, String type){
     Loader.show();
-    apiService.getZone(latitude,longitude).then((value){
-      Loader.hide();
-      if(value.success!){
-        serviceZoneResponseModel = value;
-        if(serviceZoneResponseModel.data == "no_matched"){
-          setState(() {
-            isServiceAvailable = false;
-          });
-          ValidationUtils.showAppToast("Sorry current location service not available. Please change location");
+    if(type == "hotel"){
+      apiService.getHotelZone(latitude,longitude).then((value){
+        Loader.hide();
+        if(value.success!){
+          serviceZoneResponseModel = value;
+          if(serviceZoneResponseModel.data == "no_matched"){
+            setState(() {
+              isServiceAvailable = false;
+            });
+            ValidationUtils.showAppToast("Sorry current location service not available. Please change location");
+          }else{
+            setState(() {
+              isServiceAvailable = true;
+            });
+          }
+          notifyListeners();
         }else{
-          setState(() {
-            isServiceAvailable = true;
-          });
+          // ValidationUtils.showAppToast("Something wrong");
         }
-        notifyListeners();
-      }else{
-       // ValidationUtils.showAppToast("Something wrong");
-      }
-    }).catchError((e){
-      print(e);
-      Loader.hide();
-    });
+      }).catchError((e){
+        print(e);
+        Loader.hide();
+      });
+    }else{
+      apiService.getZone(latitude,longitude).then((value){
+        Loader.hide();
+        if(value.success!){
+          serviceZoneResponseModel = value;
+          if(serviceZoneResponseModel.data == "no_matched"){
+            setState(() {
+              isServiceAvailable = false;
+            });
+            ValidationUtils.showAppToast("Sorry current location service not available. Please change location");
+          }else{
+            setState(() {
+              isServiceAvailable = true;
+            });
+          }
+          notifyListeners();
+        }else{
+          // ValidationUtils.showAppToast("Something wrong");
+        }
+      }).catchError((e){
+        print(e);
+        Loader.hide();
+      });
+    }
+
   }
 
   deleteAddress(BuildContext context,String id){

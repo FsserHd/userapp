@@ -184,7 +184,18 @@ class _HomePageState extends StateMVC<HomePage> {
                 ),
               );
             }),
-            Image.asset("assets/images/near.png",),
+            SizedBox(height: 10,),
+            InkWell(
+                onTap: (){
+                  PageNavigation.gotoHotelBookingPage(context);
+                },
+                child: Image.asset("assets/images/img.png",)),
+            SizedBox(height: 20,),
+            InkWell(
+                onTap:() {
+
+                },
+                child: Image.asset("assets/images/near.png",)),
             SizedBox(height: 10,),
             Container(
               height: 40,

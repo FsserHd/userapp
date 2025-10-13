@@ -14,6 +14,10 @@ import 'package:userapp/model/chat/chat_response.dart';
 import 'package:userapp/model/coupon/coupon_model.dart';
 import 'package:userapp/model/driver/driver_model.dart';
 import 'package:userapp/model/home/home_model.dart';
+import 'package:userapp/model/hotel/hotel_booking_response.dart';
+import 'package:userapp/model/hotel/hotel_details_booking_response.dart';
+import 'package:userapp/model/hotel/hotel_response.dart';
+import 'package:userapp/model/hotel/time_slot_response.dart';
 import 'package:userapp/model/login/otp_model.dart';
 import 'package:userapp/model/order/checkout.dart';
 import 'package:userapp/model/order/delivery_fees_response.dart';
@@ -38,6 +42,8 @@ import 'package:userapp/model/zone/zone_response_model.dart';
 import 'package:userapp/utils/preference_utils.dart';
 import '../constants/api_constants.dart';
 import '../model/common/common_response_model.dart';
+import '../model/hotel/booking_request.dart';
+import '../model/hotel/hotel_details_response.dart';
 import '../model/login/login_model.dart';
 import '../model/order/order_details_model.dart';
 import '../model/order/razorpay_order_model.dart';
@@ -290,6 +296,24 @@ class ApiService {
       String? userId = await PreferenceUtils.getUserId();
       final response = await dioClient.get(
           ApiConstants.getZone+"?myLat=${latitude}&myLon=${longitude}&user_id=${userId}");
+      if (response.statusCode == 200) {
+        return ZoneResponseModel.fromJson(response.data);
+      } else {
+
+        throw Exception(
+            'Failed to sign in. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error during sign in: $e');
+      throw e;
+    }
+  }
+
+  Future<ZoneResponseModel> getHotelZone(String latitude,String longitude) async {
+    try {
+      String? userId = await PreferenceUtils.getUserId();
+      final response = await dioClient.get(
+          ApiConstants.getzoneid+"$latitude/$longitude");
       if (response.statusCode == 200) {
         return ZoneResponseModel.fromJson(response.data);
       } else {
@@ -857,6 +881,112 @@ class ApiService {
           ApiConstants.listvendortype+"/$userId");
       if (response.statusCode == 200) {
         return VendorTypeResponse.fromJson(response.data);
+      } else {
+        throw Exception(
+            'Failed to sign in. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error during sign in: $e');
+      throw e;
+    }
+  }
+
+  Future<HotelResponse> getHotels() async {
+    try {
+      String? userId = await PreferenceUtils.getUserId();
+      String? latitude = await PreferenceUtils.getLatitude();
+      String? longitude = await PreferenceUtils.getLongitude();
+      final response = await dioClient.get(
+          ApiConstants.hotellist+"/$latitude/$longitude");
+      if (response.statusCode == 200) {
+        return HotelResponse.fromJson(response.data);
+      } else {
+        throw Exception(
+            'Failed to sign in. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error during sign in: $e');
+      throw e;
+    }
+  }
+
+  Future<HotelDetailsResponse> getHotelDetails(String hotelId) async {
+    try {
+      String? userId = await PreferenceUtils.getUserId();
+      final response = await dioClient.get(
+          ApiConstants.hoteldetails+"/$hotelId");
+      if (response.statusCode == 200) {
+        return HotelDetailsResponse.fromJson(response.data);
+      } else {
+        throw Exception(
+            'Failed to sign in. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error during sign in: $e');
+      throw e;
+    }
+  }
+
+  Future<TimeSlotResponse> checkIn(String roomId, String date, String time) async {
+    try {
+      String? userId = await PreferenceUtils.getUserId();
+      final response = await dioClient.get(
+          ApiConstants.searchtimeslot+"/$roomId?checkInDates=$date&checkInTime=$time");
+      if (response.statusCode == 200) {
+        return TimeSlotResponse.fromJson(response.data);
+      } else {
+        throw Exception(
+            'Failed to sign in. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error during sign in: $e');
+      throw e;
+    }
+  }
+
+  Future<VendorModel> hotelBooking(BookingRequest bookingRequest) async {
+    try {
+
+      String? userId = await PreferenceUtils.getUserId();
+      bookingRequest.userId = int.parse(userId!);
+      final response = await dioClient.post(
+          ApiConstants.submitbooking,bookingRequest.toJson());
+      if (response.statusCode == 200) {
+        return VendorModel.fromJson(response.data);
+      } else {
+        throw Exception(
+            'Failed to sign in. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error during sign in: $e');
+      throw e;
+    }
+  }
+
+  Future<HotelBookingResponse> myBooking() async {
+    try {
+      String? userId = await PreferenceUtils.getUserId();
+      final response = await dioClient.get(
+          ApiConstants.mybooking+"/$userId");
+            if (response.statusCode == 200) {
+        return HotelBookingResponse.fromJson(response.data);
+      } else {
+        throw Exception(
+            'Failed to sign in. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error during sign in: $e');
+      throw e;
+    }
+  }
+
+  Future<HotelDetailsBookingResponse> myBookingDetails(String roomId) async {
+    try {
+      String? userId = await PreferenceUtils.getUserId();
+      final response = await dioClient.get(
+          ApiConstants.bookingdetails+"/$roomId");
+      if (response.statusCode == 200) {
+        return HotelDetailsBookingResponse.fromJson(response.data);
       } else {
         throw Exception(
             'Failed to sign in. Status code: ${response.statusCode}');

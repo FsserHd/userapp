@@ -22,7 +22,10 @@ import '../../constants/app_style.dart';
 
 
 class MapPage extends StatefulWidget {
-  const MapPage({super.key});
+
+  String type;
+
+  MapPage(this.type, {super.key});
 
   @override
   _MapPageState createState() => _MapPageState();
@@ -82,7 +85,7 @@ class _MapPageState extends StateMVC<MapPage> {
   void _onMapTapped(LatLng position) async {
     setState(() {
       _selectedPosition = position;
-      _con.serviceCheckZone(context, position.latitude.toString(), position.longitude.toString());
+      _con.serviceCheckZone(context, position.latitude.toString(), position.longitude.toString(),widget.type);
     });
     try {
       // Get the address using the geocoding package
@@ -269,7 +272,7 @@ class _MapPageState extends StateMVC<MapPage> {
     setState(() {
       _initialPosition = LatLng(position.latitude, position.longitude);
       _selectedPosition = _initialPosition;
-      _con.serviceCheckZone(context, position.latitude.toString(), position.longitude.toString());
+      _con.serviceCheckZone(context, position.latitude.toString(), position.longitude.toString(),widget.type);
     });
 
     mapController.animateCamera(

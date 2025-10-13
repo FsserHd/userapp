@@ -50,7 +50,7 @@ class _SelectLocationPageState extends StateMVC<SelectLocationPage> {
   void _onMapTapped(LatLng position) async {
     setState(() {
       _selectedPosition = position;
-      _con.serviceCheckZone(context, position.latitude.toString(), position.longitude.toString());
+      _con.serviceCheckZone(context, position.latitude.toString(), position.longitude.toString(),"home");
     });
     try {
       // Get the address using the geocoding package
@@ -237,7 +237,7 @@ class _SelectLocationPageState extends StateMVC<SelectLocationPage> {
     setState(() {
       _initialPosition = LatLng(position.latitude, position.longitude);
       _selectedPosition = _initialPosition;
-      _con.serviceCheckZone(context, position.latitude.toString(), position.longitude.toString());
+      _con.serviceCheckZone(context, position.latitude.toString(), position.longitude.toString(),"home");
     });
 
     mapController.animateCamera(

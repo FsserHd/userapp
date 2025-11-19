@@ -9,11 +9,13 @@ class BookingRequest {
   String? hotelId;
   String? roomId;
   String? checkInTime;
+  String? checkOutTime;
   String? checkInDate;
   String? checkOutDate;
   int? adult;
   int? children;
   int? rooms;
+  int? nights = 0;
   int? userId;
   String? bookingName;
   String? bookingEmail;
@@ -77,6 +79,8 @@ class BookingRequest {
     data['rooms'] = this.rooms;
     data['user_id'] = this.userId;
     data['price_id'] = this.priceId;
+    data['checkOutTime'] = this.checkOutTime;
+    data['nights'] = this.nights;
     return data;
   }
 }

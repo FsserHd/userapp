@@ -12,6 +12,16 @@ class TimeUtils{
     return DateFormat("MMM dd, yyyy").format(inputDate);
   }
 
+  static String convertDayMonthYear(String date){
+    DateTime inputDate = DateFormat("dd-MM-yyyy").parse(date);
+    return DateFormat("MMM dd, yyyy").format(inputDate);
+  }
+
+  static String convertddMMyyyy(String date){
+    DateTime inputDate = DateFormat("yyyy-MM-dd").parse(date);
+    return DateFormat("dd-MM-yyyy").format(inputDate);
+  }
+
   static String convertMonthOnly(String date){
     DateTime inputDate = DateFormat("yyyy-MM-dd").parse(date);
     return DateFormat("MMM").format(inputDate);

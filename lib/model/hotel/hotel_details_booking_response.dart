@@ -93,10 +93,10 @@ class Details {
   String? nextBookingTime;
   String? checkOutDateTime;
   String? bookingName;
-  Null? bookingEmail;
+
   String? bookingPhone;
   String? bookingAddress;
-  Null? additionalService;
+
   String? serviceDetails;
   int? roomPrice;
   int? serviceCharge;
@@ -111,9 +111,9 @@ class Details {
   String? paymentMethod;
   String? gatewayType;
   String? paymentStatus;
-  Null? attachment;
+
   String? invoice;
-  Null? conversationId;
+
   String? createdAt;
   String? updatedAt;
 
@@ -137,10 +137,10 @@ class Details {
         this.nextBookingTime,
         this.checkOutDateTime,
         this.bookingName,
-        this.bookingEmail,
+
         this.bookingPhone,
         this.bookingAddress,
-        this.additionalService,
+
         this.serviceDetails,
         this.roomPrice,
         this.serviceCharge,
@@ -155,9 +155,9 @@ class Details {
         this.paymentMethod,
         this.gatewayType,
         this.paymentStatus,
-        this.attachment,
+
         this.invoice,
-        this.conversationId,
+
         this.createdAt,
         this.updatedAt});
 
@@ -181,10 +181,10 @@ class Details {
     nextBookingTime = json['next_booking_time'];
     checkOutDateTime = json['check_out_date_time'];
     bookingName = json['booking_name'];
-    bookingEmail = json['booking_email'];
+
     bookingPhone = json['booking_phone'];
     bookingAddress = json['booking_address'];
-    additionalService = json['additional_service'];
+
     serviceDetails = json['service_details'];
     roomPrice = json['roomPrice'];
     serviceCharge = json['serviceCharge'];
@@ -199,9 +199,9 @@ class Details {
     paymentMethod = json['payment_method'];
     gatewayType = json['gateway_type'];
     paymentStatus = json['payment_status'];
-    attachment = json['attachment'];
+
     invoice = json['invoice'];
-    conversationId = json['conversation_id'];
+
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
@@ -227,10 +227,10 @@ class Details {
     data['next_booking_time'] = this.nextBookingTime;
     data['check_out_date_time'] = this.checkOutDateTime;
     data['booking_name'] = this.bookingName;
-    data['booking_email'] = this.bookingEmail;
+
     data['booking_phone'] = this.bookingPhone;
     data['booking_address'] = this.bookingAddress;
-    data['additional_service'] = this.additionalService;
+
     data['service_details'] = this.serviceDetails;
     data['roomPrice'] = this.roomPrice;
     data['serviceCharge'] = this.serviceCharge;
@@ -245,9 +245,7 @@ class Details {
     data['payment_method'] = this.paymentMethod;
     data['gateway_type'] = this.gatewayType;
     data['payment_status'] = this.paymentStatus;
-    data['attachment'] = this.attachment;
     data['invoice'] = this.invoice;
-    data['conversation_id'] = this.conversationId;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     return data;
@@ -261,10 +259,10 @@ class RoomContentInfo {
   int? roomCategory;
   String? title;
   String? slug;
-  Null? address;
+
   String? amenities;
   String? description;
-  Null? metaKeyword;
+
   String? metaDescription;
   String? createdAt;
   String? updatedAt;
@@ -276,10 +274,10 @@ class RoomContentInfo {
         this.roomCategory,
         this.title,
         this.slug,
-        this.address,
+
         this.amenities,
         this.description,
-        this.metaKeyword,
+
         this.metaDescription,
         this.createdAt,
         this.updatedAt});
@@ -291,10 +289,10 @@ class RoomContentInfo {
     roomCategory = json['room_category'];
     title = json['title'];
     slug = json['slug'];
-    address = json['address'];
+
     amenities = json['amenities'];
     description = json['description'];
-    metaKeyword = json['meta_keyword'];
+
     metaDescription = json['meta_description'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
@@ -308,10 +306,10 @@ class RoomContentInfo {
     data['room_category'] = this.roomCategory;
     data['title'] = this.title;
     data['slug'] = this.slug;
-    data['address'] = this.address;
+
     data['amenities'] = this.amenities;
     data['description'] = this.description;
-    data['meta_keyword'] = this.metaKeyword;
+
     data['meta_description'] = this.metaDescription;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
@@ -332,8 +330,7 @@ class HotelContentInfo {
   String? address;
   String? amenities;
   String? description;
-  Null? metaKeyword;
-  Null? metaDescription;
+
   String? createdAt;
   String? updatedAt;
 
@@ -350,8 +347,7 @@ class HotelContentInfo {
         this.address,
         this.amenities,
         this.description,
-        this.metaKeyword,
-        this.metaDescription,
+
         this.createdAt,
         this.updatedAt});
 
@@ -368,8 +364,7 @@ class HotelContentInfo {
     address = json['address'];
     amenities = json['amenities'];
     description = json['description'];
-    metaKeyword = json['meta_keyword'];
-    metaDescription = json['meta_description'];
+
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
@@ -388,8 +383,7 @@ class HotelContentInfo {
     data['address'] = this.address;
     data['amenities'] = this.amenities;
     data['description'] = this.description;
-    data['meta_keyword'] = this.metaKeyword;
-    data['meta_description'] = this.metaDescription;
+
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     return data;

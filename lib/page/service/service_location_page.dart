@@ -170,14 +170,14 @@ class _ServiceLocationPageState extends StateMVC<ServiceLocationPage> {
        }
     });
 
-    mapController.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: _initialPosition!,
-          zoom: 14.0,
-        ),
-      ),
-    );
+    // mapController.animateCamera(
+    //   CameraUpdate.newCameraPosition(
+    //     CameraPosition(
+    //       target: _initialPosition!,
+    //       zoom: 14.0,
+    //     ),
+    //   ),
+    // );
 
     final geocodingResponse = await _geocoding.searchByLocation(
         location.Location(lat:double.parse(currentLatitude!), lng: double.parse(currentLongitude!)),
@@ -186,6 +186,7 @@ class _ServiceLocationPageState extends StateMVC<ServiceLocationPage> {
     if (geocodingResponse.results.isNotEmpty) {
       setState(() {
         _address = geocodingResponse.results.first.formattedAddress ?? '';
+        print("Map data: "+_address);
         _con.request.fromlocation  = _address;
       });
     }
@@ -306,7 +307,7 @@ class _ServiceLocationPageState extends StateMVC<ServiceLocationPage> {
                           borderRadius: BorderRadius.circular(15.0), // Rounded corners
                         ),
                         child: Center(
-                          child:   Text("Processed",style: AppStyle.font14MediumBlack87.override(color: Colors.white)),
+                          child:   Text("Confirm",style: AppStyle.font14MediumBlack87.override(color: Colors.white)),
                         ),
                       ),
                     ):Container(),

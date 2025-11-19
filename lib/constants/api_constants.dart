@@ -59,7 +59,7 @@ class ApiConstants{
   //Hotel Api's
 
   static var hotellist = HOTEL_BASE_URL+"hotellist";
-  static var hoteldetails = HOTEL_BASE_URL+"hoteldetails";
+  static var hoteldetails = HOTEL_BASE_URL+"hoteldetailsnew";
   static var searchtimeslot = HOTEL_BASE_URL+"searchtimeslot";
   static var submitbooking = HOTEL_BASE_URL+"submitbooking";
   static var mybooking = HOTEL_BASE_URL+"mybooking";

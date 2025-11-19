@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -47,7 +49,7 @@ class _HotelRoomPageState extends StateMVC<HotelRoomPage> {
   late GoogleMapController mapController;
   final _placesApiKey = 'AIzaSyBRxE8E6WSJaIzLPx7zpGHEbo5djXx3bTY'; // Replace with your API key
   LatLng? vendorAddress;
-
+  List<String>? amenitiesList;
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -59,6 +61,7 @@ class _HotelRoomPageState extends StateMVC<HotelRoomPage> {
     super.initState();
    // checkInController.text = widget.bookingRequest.checkInDate!;
     vendorAddress = LatLng(double.parse(widget.hotelData.latitude!), double.parse(widget.hotelData.longitude!));
+    amenitiesList = List<String>.from(jsonDecode(widget.roomData.amenities!));
   }
 
   Future<void> _pickDate(BuildContext context, bool isCheckIn) async {
@@ -70,7 +73,7 @@ class _HotelRoomPageState extends StateMVC<HotelRoomPage> {
     );
 
     if (picked != null) {
-      String formattedDate = DateFormat('dd/MM/yyyy').format(picked);
+      String formattedDate = DateFormat('dd-MM-yyyy').format(picked);
 
       setState(() {
         if (isCheckIn) {
@@ -108,6 +111,13 @@ class _HotelRoomPageState extends StateMVC<HotelRoomPage> {
 
   @override
   Widget build(BuildContext context) {
+    final DateTime checkIn = DateFormat("dd-MM-yyyy").parse(widget.bookingRequest.checkInDate!);
+    final DateTime checkOut = DateFormat("dd-MM-yyyy").parse(widget.bookingRequest.checkOutDate!);
+    final int nights = checkOut.difference(checkIn).inDays;
+    // Calculate nights difference
+   // int nights = DateTime.parse(widget.bookingRequest.checkOutDate!).difference(DateTime.parse(widget.bookingRequest.checkInDate!)).inDays;
+
+
     return Scaffold(
       backgroundColor: AppColors.dashboardBgColor,
       appBar:  AppBar(
@@ -125,7 +135,7 @@ class _HotelRoomPageState extends StateMVC<HotelRoomPage> {
             top: 0,
               left: 0,
               right: 0,
-              bottom: selectedPrice!=null ? 60 : 0,
+              bottom: 80,
               child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -206,252 +216,521 @@ class _HotelRoomPageState extends StateMVC<HotelRoomPage> {
                     },
                   ),
                   SizedBox(height: 20,),
-                  Column(
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Hotel Name
-                      Text(
-                        widget.roomData.roomTitle ?? "",
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      const SizedBox(height: 6),
-
-                      // Rating
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.teal,
-                              borderRadius: BorderRadius.circular(6),
+                      // Left Column: Hotel Info
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Hotel Name
+                            Text(
+                              widget.roomData.roomTitle ?? "",
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.black87,
+                              ),
                             ),
-                            child: Row(
+                            const SizedBox(height: 2),
+                            Text(
+                              widget.roomData.hotelName ?? "",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.black26,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+
+                            // Rating + Direction Icon
+                            Row(
                               children: [
-                                const Icon(Icons.star, color: Colors.white, size: 12),
-                                const SizedBox(width: 2),
-                                Text(
-                                  widget.roomData.stars?.toString() ?? "0",
-                                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                                Container(
+                                  padding:
+                                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.teal,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.star,
+                                          color: Colors.white, size: 14),
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        widget.roomData.stars?.toString() ?? "0",
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                GestureDetector(
+                                  onTap: () {
+                                    // open google maps or direction
+                                  },
+                                  child: Row(
+                                    children: const [
+                                      Icon(Icons.directions,
+                                          color: Colors.blueAccent, size: 16),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        "Direction",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.blueAccent,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
 
-                      const SizedBox(height: 8),
-                      Text(
-                        "${widget.hotelData.distance} - ${widget.hotelData.address!}",
-                        style: TextStyle(fontSize: 12, color: Colors.black54),
-                      ),
-                      const SizedBox(height: 8),
+                            const SizedBox(height: 10),
 
-                      // Price Section
-                      Row(
-                        children: [
-                          Text(
-                            ApiConstants.currency + (widget.roomData.minPrice?.toString() ?? "0"),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                            // Address
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.location_on_outlined,
+                                    size: 14, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    "${widget.hotelData.distance} • ${widget.hotelData.address!}",
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.black54,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          const SizedBox(width: 6),
-                          const Text(
-                            "/ Min Price",
-                            style: TextStyle(fontSize: 12, color: Colors.black54),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: checkInController,
-                          readOnly: true,
-                          decoration: InputDecoration(
-                            labelText: "Check-in",
-                            hintText: "DD/MM/YY",
-                            suffixIcon: Icon(Icons.calendar_today_outlined),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                            const SizedBox(height: 10),
+
+                            // Price
+                            Row(
+                              children: [
+                                Text(
+                                  "${ApiConstants.currency}${widget.bookingRequest.price?.toString() ?? "0"}",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.teal,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                              ],
                             ),
-                          ),
-                          onTap: () => _pickDate(context, true),
+                          ],
                         ),
                       ),
+
                       const SizedBox(width: 12),
-                      Expanded(
-                        child: TextField(
-                          controller: checkInTimeController,
-                          readOnly: true,
-                          decoration: InputDecoration(
-                            labelText: "Check-In-Time",
-                            hintText: "HH:MM",
-                            suffixIcon: Icon(Icons.calendar_today_outlined),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+
+                      // Right Side: Mini Map
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: SizedBox(
+                          height: 100,
+                          width: 100,
+                          child: GoogleMap(
+                            onMapCreated: _onMapCreated,
+                            zoomGesturesEnabled: false,
+                            scrollGesturesEnabled: false,
+                            tiltGesturesEnabled: false,
+                            rotateGesturesEnabled: false,
+                            initialCameraPosition: CameraPosition(
+                              target: vendorAddress!,
+                              zoom: 14.0,
                             ),
+                            markers: {
+                              Marker(
+                                markerId: MarkerId(widget.hotelData.title!),
+                                position: vendorAddress!,
+                              ),
+                            },
+                            myLocationEnabled: false,
+                            myLocationButtonEnabled: false,
                           ),
-                          onTap: () => _pickTime(context, false),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 20,),
-                  if(_con.timeSlots.isNotEmpty)
-                  Text(
-                    "Select Duration",
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                ),
+                SizedBox(height: 20,),
+                  Card(
+                    elevation: 4,
+                    margin: const EdgeInsets.all(0),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 🔹 Title Row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: const [
+                              Text(
+                                "Your Stay Details",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Icon(Icons.calendar_today_outlined, color: Colors.teal),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+
+                          // 🔹 Check-in and Check-out Dates
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildDateBox(
+                                context,
+                                title: "Check-In",
+                                date: DateFormat("dd MMM yyyy").format(checkIn) + " 11:00 AM",
+                                icon: Icons.login_rounded,
+                              ),
+                              SizedBox(width: 2,),
+                              Container(
+                                height: 45,
+                                width: 1.2,
+                                color: Colors.grey.shade300,
+                              ),
+                              SizedBox(width: 2,),
+                              _buildDateBox(
+                                context,
+                                title: "Check-Out",
+                                date: DateFormat("dd MMM yyyy").format(checkOut)+ " 10:00 AM",
+                                icon: Icons.logout_rounded,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          // 🔹 Nights Info
+                          Center(
+                            child: Text(
+                              "$nights ${nights > 1 ? 'Nights' : 'Night'} Stay",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+
+                          // 🔹 Guests & Rooms Info
+                          GridView.count(
+                            crossAxisCount: 3,
+                            shrinkWrap: true,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: [
+                              _buildInfoCard(
+                                icon: Icons.people_alt_outlined,
+                                label: "Adults",
+                                value: "${widget.bookingRequest.adult}",
+                                color: Colors.teal,
+                              ),
+                              _buildInfoCard(
+                                icon: Icons.child_care_outlined,
+                                label: "Children",
+                                value: "${widget.bookingRequest.children}",
+                                color: Colors.orangeAccent,
+                              ),
+                              _buildInfoCard(
+                                icon: Icons.meeting_room_outlined,
+                                label: "Rooms",
+                                value: "${widget.bookingRequest.rooms}",
+                                color: Colors.blueAccent,
+                              ),
+                            ],
+                          ),
+
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(height: 10,),
-                  if(_con.timeSlots.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey, width: 1.2),
-                        borderRadius: BorderRadius.circular(12),
+                  Text(
+                    "Room & Amenties",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 2,),
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      // 🛏 Beds
+                      Row(
+                        children: [
+                          Icon(Icons.bed, color: Colors.teal, size: 20),
+                          SizedBox(width: 5),
+                          Text("${widget.roomData.bed} Beds",
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87)),
+                        ],
                       ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<HourlyPrices>(
-                          hint: const Text("Select Duration"),
-                          value: selectedPrice,
-                          isExpanded: true,
-                          items: _con.timeSlots.map((priceData) {
-                            return DropdownMenuItem<HourlyPrices>(
-                              value: priceData, // keep the full object
-                              child: Text(
-                                "${priceData.hour} Hours - ${ApiConstants.currency}${priceData.price}",
+                      // 🚿 Bathroom
+                      Row(
+                        children: [
+                          Icon(Icons.bathtub_outlined, color: Colors.teal, size: 20),
+                          SizedBox(width: 5),
+                          Text("${widget.roomData.bathroom} Bathroom",
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: List.generate(
+                      amenitiesList!.length,
+                          (index) {
+                        var amenity = amenitiesList![index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.check, size: 16, color: Colors.teal),
+                              const SizedBox(width: 6),
+                              Text(
+                                ApiConstants.amenities[int.parse(amenity)],
                                 style: const TextStyle(fontSize: 14),
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              selectedPrice = value; // store whole object
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                  SizedBox(height: 20,),
-                  Container(
-                    height: 250,
-                    child: GoogleMap(
-                      onMapCreated: _onMapCreated,
-                      zoomGesturesEnabled: true,
-                      scrollGesturesEnabled: true,
-                      tiltGesturesEnabled: true,
-                      rotateGesturesEnabled: true,
-                      initialCameraPosition: CameraPosition(
-                        target: vendorAddress!,
-                        zoom: 14.0,
-                      ),
-                      markers: {
-                        Marker(
-                          markerId: MarkerId(widget.hotelData.title!),
-                          position: vendorAddress!,
-                        ),
+                            ],
+                          ),
+                        );
                       },
-                      myLocationEnabled: true, // Enables the "my location" layer which shows the user's location
-                      myLocationButtonEnabled: true, // Adds a button to move the camera to the user's location
                     ),
                   )
                 ],
               ),
             ),
           )),
-          if(selectedPrice!=null)
           Positioned(
               left: 0,
               right: 0,
               bottom: 0,
               child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.black87, // background like in your screenshot
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 6,
+                      offset: const Offset(0, -1),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Row(
+                    // 💰 Price Section
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${ApiConstants.currency}${selectedPrice!.price}",
-                          style: TextStyle(
+                          "${ApiConstants.currency}${widget.bookingRequest.price}",
+                          style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(width: 5,),
-                        Text(
-                          " - ${selectedPrice!.hour} Hours",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(Icons.nightlight_round,
+                                size: 14, color: Colors.white70),
+                            const SizedBox(width: 4),
+                            Text(
+                              "${widget.bookingRequest.nights ?? 1} night(s)",
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            const Icon(Icons.meeting_room_outlined,
+                                size: 14, color: Colors.white70),
+                            const SizedBox(width: 4),
+                            Text(
+                              "${widget.bookingRequest.rooms ?? 1} room(s)",
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    SizedBox(height: 4),
-                    Text(
-                      "${checkInController.text} - ${checkInTimeController.text}",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
+
+                    // 🟩 Book Now Button
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        widget.bookingRequest.roomId = widget.roomData.id.toString();
+                        widget.bookingRequest.priceId = "0";
+                        widget.bookingRequest.hotelId = widget.hotelData.id.toString();
+                        widget.bookingRequest.vendorId = widget.hotelData.vendorId.toString();
+                        widget.bookingRequest.gateway = 1;
+                        widget.bookingRequest.checkInTime = "11:00 AM";
+                        widget.bookingRequest.hours = "24";
+
+                        PageNavigation.gotoHotelCheckoutPage(
+                            context, widget.hotelData, widget.roomData, widget.bookingRequest);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 2,
+                      ),
+                      icon: const Icon(Icons.arrow_forward_ios_rounded,
+                          color: Colors.white, size: 16),
+                      label: const Text(
+                        "Book Now",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle room selection
-                    widget.bookingRequest.roomId = widget.roomData.id.toString();
-                    widget.bookingRequest.priceId = selectedPrice!.id.toString();
-                    widget.bookingRequest.hotelId = widget.hotelData.id.toString();
-                    widget.bookingRequest.vendorId = widget.hotelData.vendorId.toString();
-                    widget.bookingRequest.gateway = 1;
-                    widget.bookingRequest.checkInTime = checkInTimeController.text;
-                    widget.bookingRequest.checkInDate = checkInController.text;
-                    widget.bookingRequest.price = selectedPrice!.price;
-                    widget.bookingRequest.hours = selectedPrice!.hour.toString();
-                    PageNavigation.gotoHotelCheckoutPage(context, widget.hotelData, widget.roomData, widget.bookingRequest);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    "Book Now",
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold,color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          )
+              )
           )
         ],
       ),
     );
   }
+
+  Widget _buildInfoCard({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.black54,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  // 🔹 Small Widget for date section
+  Widget _buildDateBox(BuildContext context,
+      {required String title, required String date, required IconData icon}) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.grey.shade50,
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.teal, size: 20),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.black54,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              date,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 }

@@ -910,11 +910,11 @@ class ApiService {
     }
   }
 
-  Future<HotelDetailsResponse> getHotelDetails(String hotelId) async {
+  Future<HotelDetailsResponse> getHotelDetails(String hotelId, BookingRequest bookingRequest) async {
     try {
       String? userId = await PreferenceUtils.getUserId();
       final response = await dioClient.get(
-          ApiConstants.hoteldetails+"/$hotelId");
+          ApiConstants.hoteldetails+"/$hotelId?checkInDates=${bookingRequest.checkInDate}&checkOutDates=${bookingRequest.checkOutDate}");
       if (response.statusCode == 200) {
         return HotelDetailsResponse.fromJson(response.data);
       } else {

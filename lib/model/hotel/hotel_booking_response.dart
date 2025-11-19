@@ -48,14 +48,16 @@ class HotelBookingData {
   String? nextBookingTime;
   String? checkOutDateTime;
   String? bookingName;
-  Null? bookingEmail;
+
   String? bookingPhone;
   String? bookingAddress;
-  Null? additionalService;
+
   String? serviceDetails;
   int? roomPrice;
   int? serviceCharge;
   String? total;
+  String? rooms;
+  String? nights;
   String? discount;
   String? tax;
   String? grandTotal;
@@ -91,10 +93,10 @@ class HotelBookingData {
         this.nextBookingTime,
         this.checkOutDateTime,
         this.bookingName,
-        this.bookingEmail,
+
         this.bookingPhone,
         this.bookingAddress,
-        this.additionalService,
+
         this.serviceDetails,
         this.roomPrice,
         this.serviceCharge,
@@ -112,7 +114,7 @@ class HotelBookingData {
         this.invoice,
         this.createdAt,
         this.updatedAt,
-        this.roomInfos});
+        this.roomInfos,this.rooms,this.nights});
 
   HotelBookingData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -134,16 +136,18 @@ class HotelBookingData {
     nextBookingTime = json['next_booking_time'];
     checkOutDateTime = json['check_out_date_time'];
     bookingName = json['booking_name'];
-    bookingEmail = json['booking_email'];
+
     bookingPhone = json['booking_phone'];
     bookingAddress = json['booking_address'];
-    additionalService = json['additional_service'];
+
     serviceDetails = json['service_details'];
     roomPrice = json['roomPrice'];
     serviceCharge = json['serviceCharge'];
     total = json['total'];
     discount = json['discount'];
     tax = json['tax'];
+    rooms = json['rooms'];
+    nights = json['nights'];
     grandTotal = json['grand_total'];
     currencyText = json['currency_text'];
     currencyTextPosition = json['currency_text_position'];
@@ -181,10 +185,10 @@ class HotelBookingData {
     data['next_booking_time'] = this.nextBookingTime;
     data['check_out_date_time'] = this.checkOutDateTime;
     data['booking_name'] = this.bookingName;
-    data['booking_email'] = this.bookingEmail;
+
     data['booking_phone'] = this.bookingPhone;
     data['booking_address'] = this.bookingAddress;
-    data['additional_service'] = this.additionalService;
+
     data['service_details'] = this.serviceDetails;
     data['roomPrice'] = this.roomPrice;
     data['serviceCharge'] = this.serviceCharge;

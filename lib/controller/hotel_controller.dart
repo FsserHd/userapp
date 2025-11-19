@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
 import 'package:userapp/model/hotel/booking_request.dart';
 import 'package:userapp/model/hotel/hotel_booking_response.dart';
@@ -13,6 +14,7 @@ import 'package:userapp/navigation/page_navigation.dart';
 
 import '../model/hotel/hotel_details_response.dart';
 import '../model/profile/profile_model.dart';
+import '../model/zone/zone_information_model.dart';
 import '../network/api_service.dart';
 import '../network/dio_client.dart';
 import '../utils/loader.dart';
@@ -23,6 +25,7 @@ class HotelController extends ControllerMVC{
   ApiService apiService = ApiService();
 
   List<Hotels> hotelList = [];
+  List<Hotels> allHotelList = [];
   List<Rooms> roomList = [];
   List<HourlyPrices> timeSlots = [];
   String distance = "0.0";
@@ -48,6 +51,8 @@ class HotelController extends ControllerMVC{
         futures.add(getDistance(origin, destination, "AIzaSyBRxE8E6WSJaIzLPx7zpGHEbo5djXx3bTY").then((value) {
           element.distance = distance;
           hotelList.add(element);
+          allHotelList = hotelList;
+
         }));
       }
     }).catchError((e){
@@ -56,6 +61,50 @@ class HotelController extends ControllerMVC{
     });
     notifyListeners();
   }
+
+  void applyPriceFilter(String sortOrder, double minPrice, double maxPrice) {
+    // Sort logic
+    hotelList.sort((a, b) {
+      if (sortOrder == "Low to High") {
+        return a.minPrice!.compareTo(b.minPrice!);
+      } else {
+        return b.minPrice!.compareTo(a.minPrice!);
+      }
+    });
+
+    // Filter logic
+    hotelList = hotelList
+        .where((hotel) =>
+    hotel.minPrice! >= minPrice && hotel.minPrice! <= maxPrice)
+        .toList();
+
+    notifyListeners();
+  }
+
+  void applyRatingFilter(List<int> selectedRatings) {
+    if (selectedRatings.isEmpty) {
+      hotelList = List.from(allHotelList);
+    } else {
+      hotelList = allHotelList
+          .where((hotel) => selectedRatings.contains(hotel.stars))
+          .toList();
+    }
+    notifyListeners();
+  }
+
+  void applyDistanceFilter(double minKm, double maxKm) {
+    // Example: filter your hotelList based on distance range
+    final filtered = hotelList.where((hotel) {
+      final distance = double.tryParse(hotel.distance ?? "0") ?? 0;
+      return distance >= minKm && distance <= maxKm;
+    }).toList();
+
+    hotelList = filtered;
+    notifyListeners();
+  }
+
+
+
 
   Future<void> getDistance(String origin, String destination, String apiKey) async {
     final url =
@@ -78,9 +127,9 @@ class HotelController extends ControllerMVC{
   }
 
 
-  getHotelDetails(BuildContext context,String hotelId) async {
+  getHotelDetails(BuildContext context,String hotelId, BookingRequest bookingRequest) async {
     Loader.show();
-    await apiService.getHotelDetails(hotelId).then((value) async {
+    await apiService.getHotelDetails(hotelId,bookingRequest).then((value) async {
       Loader.hide();
       roomList = value.data!.rooms!;
     }).catchError((e){
@@ -126,6 +175,7 @@ class HotelController extends ControllerMVC{
   }
 
   booking(BuildContext context, BookingRequest bookingRequest) async {
+    bookingRequest.checkOutTime = "10:00 AM";
     print(bookingRequest.toJson());
     Loader.show();
     await apiService.hotelBooking(bookingRequest).then((value) async {
@@ -165,17 +215,49 @@ class HotelController extends ControllerMVC{
     notifyListeners();
   }
 
+  DateTime? checkInn;
+  DateTime? checkOut;
+  int nights = 0;
+  List<String>? amenitiesList;
   myBookingDetails(BuildContext context,String roomId) async {
     Loader.show();
     await apiService.myBookingDetails(roomId).then((value) async {
       Loader.hide();
       bookingDetailsData = value.data!;
+      checkInn = DateFormat("dd-MM-yyyy").parse(bookingDetailsData.details!.checkInDate!);
+      checkOut = DateFormat("dd-MM-yyyy").parse(bookingDetailsData.details!.checkOutDate!);
+      nights = checkOut!.difference(checkInn!).inDays;
+      amenitiesList = List<String>.from(jsonDecode(bookingDetailsData.roomContentInfo!.amenities!));
     }).catchError((e){
       print(e);
       Loader.hide();
     });
     notifyListeners();
   }
+
+  var zoneInformationModel = ZoneInformationModel();
+
+  getZoneInformation(BuildContext context){
+
+    Loader.show();
+    apiService.getZoneInformation().then((value){
+      Loader.hide();
+      if(value.success!){
+        setState(() {
+          zoneInformationModel = value;
+
+        });
+        notifyListeners();
+      }else{
+        //ValidationUtils.showAppToast("Something wrong");
+      }
+    }).catchError((e){
+      print(e);
+      Loader.hide();
+    });
+    notifyListeners();
+  }
+
 
 
 }

@@ -12,6 +12,7 @@ import '../../constants/app_style.dart';
 import '../../flutter_flow/flutter_flow_util.dart';
 import '../../navigation/page_navigation.dart';
 import '../../utils/preference_utils.dart';
+import '../address/address_page.dart';
 import '../auth/login/inside_login_page.dart';
 
 class HotelBookingScreen extends StatefulWidget {
@@ -27,13 +28,14 @@ class _HotelBookingScreenState extends State<HotelBookingScreen> {
   List<String> imageList = ["https://thee4square.com/images/123.jpg","https://thee4square.com/images/123.jpg"];
   DateTime? checkIn;
   DateTime? checkOut;
-  int adults = 1;
+  DateTimeRange? selectedRange;
+  int adults = 2;
   int children = 0;
   int rooms = 1;
   String? location = "";
   var checkInController = TextEditingController();
   var checkOutController = TextEditingController();
-
+  var bookingRequest = BookingRequest();
 
   @override
   void initState() {
@@ -46,28 +48,66 @@ class _HotelBookingScreenState extends State<HotelBookingScreen> {
     });
   }
 
+  void _updateAdults(int value) {
+    setState(() {
+      adults = value;
+      rooms = (adults / 2).ceil(); // Ensure room count matches adults
+    });
+  }
+
+  void _updateRooms(int value) {
+    setState(() {
+      rooms = value;
+      int maxAdults = rooms * 2;
+      if (adults > maxAdults) {
+        adults = maxAdults; // Adjust adults if exceeding room capacity
+      }
+    });
+  }
 
 
-  Future<void> _pickDate(BuildContext context, bool isCheckIn) async {
-    final DateTime? picked = await showDatePicker(
+
+
+  String get formattedDateRange {
+    if (selectedRange == null) return "Select Dates";
+    final start = DateFormat("MMM dd").format(selectedRange!.start);
+    final end = DateFormat("MMM dd").format(selectedRange!.end);
+    bookingRequest.checkInDate = DateFormat("dd-MM-yyyy").format(selectedRange!.start);
+    bookingRequest.checkOutDate = DateFormat("dd-MM-yyyy").format(selectedRange!.end);
+    return "$start → $end";
+  }
+
+  Future<void> pickDateRange() async {
+    final DateTime now = DateTime.now();
+    final DateTimeRange? picked = await showDateRangePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2023),
-      lastDate: DateTime(2030),
+      // 🔹 Allow only from today onwards
+      firstDate: DateTime(now.year, now.month, now.day),
+      lastDate: DateTime(now.year + 1, 12, 31),
+
+      initialDateRange: selectedRange ??
+          DateTimeRange(
+            start: DateTime(now.year, now.month, now.day),
+            end: DateTime(now.year, now.month, now.day + 1),
+          ),
+
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Colors.teal,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
-    if (picked != null) {
-      String formattedDate = DateFormat('dd/MM/yyyy').format(picked);
-
-      setState(() {
-        if (isCheckIn) {
-          checkIn = picked;
-          checkInController.text = formattedDate; // ✅ Now shows 14/09/2025
-        } else {
-          checkOut = picked;
-          checkOutController.text = formattedDate; // ✅ Now shows 14/09/2025
-        }
-      });
+    if (picked != null && picked != selectedRange) {
+      setState(() => selectedRange = picked);
     }
   }
 
@@ -125,248 +165,173 @@ class _HotelBookingScreenState extends State<HotelBookingScreen> {
               }).toList(),
             ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Welcome to your next \n",
-                          style: AppStyle.font14MediumBlack87.override(color: Colors.black,fontSize: 24),
+              padding: const EdgeInsets.all(8.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    const Text(
+                      "Find Your Perfect Stay 🏨",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "Book your next destination in seconds",
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Destination Field
+                    InkWell(
+                      onTap: () async {
+                        // Navigate to location picker
+                        String?  userId = await PreferenceUtils.getUserId();
+                        if(userId ==null){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const InsideLoginPage(),
+                            ),
+                          );
+                        }else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddressPage("hotel"),
+                            ),
+                          ).then((value){
+                            setState(() {
+                              location = value;
+                            });
+                          });
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.shade300),
                         ),
-                        TextSpan(
-                          text: "4 Square",
-                          style: AppStyle.font14MediumBlack87.override(color: AppColors.themeColor,fontSize: 18),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.location_on_outlined, color: Colors.teal),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Destination",
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey)),
+                                  Text(location!,
+                                      style: TextStyle(
+                                          fontSize: 15, fontWeight: FontWeight.w500)),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.arrow_forward_ios, size: 16)
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Date Range Picker
+                    InkWell(
+                      onTap: pickDateRange,
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.calendar_today_outlined,
+                                color: Colors.teal),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Check-in / Check-out",
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey)),
+                                  Text(formattedDateRange,
+                                      style: const TextStyle(
+                                          fontSize: 15, fontWeight: FontWeight.w500)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Guests & Rooms
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.15),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    "Discover the Perfect Stay with WanderStay",
-                    style: AppStyle.font14RegularBlack87.override(color: Colors.orange,fontSize: 14),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Location Field
-                  InkWell(
-                    onTap: () async {
-                      String?  userId = await PreferenceUtils.getUserId();
-                      if(userId ==null){
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const InsideLoginPage(),
-                          ),
-                        );
-                      }else {
-                        PageNavigation.gotoAddressPage(context, "hotel");
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade500),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.location_on_outlined, color: Colors.grey),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  location!,
-                                  style: AppStyle.font14RegularBlack87.override(fontSize: 10),
-                                ),
-                                SizedBox(height: 2),
-                                Text(
-                                  "Change Location",
-                                    style: AppStyle.font14RegularBlack87.override(fontSize: 14),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _modernCounter("Adults", adults, (v) => _updateAdults(v)),
+                        _modernCounter("Children", children, (v) => setState(() => children = v)),
+                        _modernCounter("Rooms", rooms, (v) => _updateRooms(v)),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 10),
+                    const SizedBox(height: 24),
 
-                  // Check-in / Check-out
-
-
-                  // Guests and Rooms
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade500),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text("Adults"),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        if (adults > 1) adults--;
-                                      });
-                                    },
-                                    icon: Icon(Icons.remove_circle_outline),
-                                  ),
-                                  Text(
-                                    "$adults",
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        adults++;
-                                      });
-                                    },
-                                    icon:  Icon(Icons.add_circle_outline),
-                                  ),
-                                ],
-                              ),
-                            ],
+                    // Search Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: Colors.teal,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade500),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text("Children"),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        if (children > 1) children--;
-                                      });
-                                    },
-                                    icon: Icon(Icons.remove_circle_outline),
-                                  ),
-                                  Text(
-                                    "$children",
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        children++;
-                                      });
-                                    },
-                                    icon: Icon(Icons.add_circle_outline),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade500),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text("Rooms"),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        if (rooms > 1) rooms--;
-                                      });
-                                    },
-                                    icon: Icon(Icons.remove_circle_outline),
-                                  ),
-                                  Text(
-                                    "$rooms",
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        rooms++;
-                                      });
-                                    },
-                                    icon: Icon(Icons.add_circle_outline),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  // Find Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        backgroundColor: Colors.blue,
-                      ),
-                      onPressed: () {
+                        onPressed: () {
+                          // Send booking request or navigate to next page
+                          if(selectedRange!=null){
 
-                          var bookingRequest = BookingRequest();
                           bookingRequest.adult = adults;
                           bookingRequest.children = children;
                           bookingRequest.rooms = rooms;
                           bookingRequest.bookingAddress  = location;
                           PageNavigation.gotoHotelVendorPage(context,bookingRequest);
-                      },
-                      child: const Text(
-                        "FIND",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          }else{
+                            ValidationUtils.showAppToast("Check-in & Check-out date required");
+                          }
+                        },
+                        child: const Text(
+                          "Find Hotels",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             )
           ],
@@ -375,3 +340,69 @@ class _HotelBookingScreenState extends State<HotelBookingScreen> {
     );
   }
 }
+
+Widget _modernCounter(String label, int value, Function(int) onChanged) {
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Text(
+        label,
+        style: const TextStyle(
+          fontSize: 13,
+          color: Colors.grey,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      const SizedBox(height: 6),
+      Container(
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _circleButton(
+              icon: Icons.remove,
+              onTap: () {
+                if (value > 0) onChanged(value - 1);
+              },
+            ),
+            const SizedBox(width: 10),
+            Text(
+              "$value",
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 10),
+            _circleButton(
+              icon: Icons.add,
+              onTap: () => onChanged(value + 1),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _circleButton({required IconData icon, required VoidCallback onTap}) {
+  return InkWell(
+    onTap: onTap,
+    borderRadius: BorderRadius.circular(50),
+    child: Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: Colors.teal.withOpacity(0.15),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(icon, size: 18, color: Colors.teal),
+    ),
+  );
+}
+
+

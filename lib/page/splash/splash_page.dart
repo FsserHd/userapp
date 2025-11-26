@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
@@ -38,7 +38,7 @@ class _SplashPageState extends StateMVC<SplashPage> {
     _con = controller as AuthController;
   }
 
-  late StreamSubscription<ConnectivityResult> _subscription;
+ // late StreamSubscription<ConnectivityResult> _subscription;
   bool _isDialogOpen = false;
 
 

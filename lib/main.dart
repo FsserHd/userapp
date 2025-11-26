@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -128,7 +128,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp>  {
 
-  late StreamSubscription<ConnectivityResult> _subscription;
+  //late StreamSubscription<ConnectivityResult> _subscription;
   bool _isDialogOpen = false;
 
 
@@ -176,7 +176,7 @@ class _MyAppState extends State<MyApp>  {
 
   @override
   void dispose() {
-    _subscription.cancel();
+   // _subscription.cancel();
     super.dispose();
   }
 

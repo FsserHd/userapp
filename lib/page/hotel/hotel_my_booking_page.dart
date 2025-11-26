@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
 import 'package:userapp/controller/hotel_controller.dart';
 import 'package:userapp/utils/time_utils.dart';
+import 'package:userapp/utils/validation_utils.dart';
 
 import '../../constants/api_constants.dart';
 import '../../constants/app_colors.dart';
@@ -57,9 +58,180 @@ class _HotelMyBookingPageState extends StateMVC<HotelMyBookingPage> {
 
             return InkWell(
               onTap: () {
-                PageNavigation.gotoHotelMyBookingDetails(context, bookingBean);
+                if(bookingBean.isCancel == 1){
+                  ValidationUtils.showAppToast("Booking Cancelled");
+                }else {
+                  PageNavigation.gotoHotelMyBookingDetails(
+                      context, bookingBean);
+                }
               },
-              child: Container(
+              child:bookingBean.isCancel == 1
+                  ? Stack(
+                children: [
+                  // 🔸 FADED ORIGINAL CARD
+                  Opacity(
+                    opacity: 0.45, // Dim the whole layout
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          // 🖼️ IMAGE + GRADIENT
+                          Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                                child: Image.network(
+                                  bookingBean.roomInfos?.images?.first ?? "",
+                                  height: 180,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Container(
+                                height: 180,
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                    colors: [
+                                      Colors.black.withOpacity(0.6),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          // 📖 DETAILS
+                          Padding(
+                            padding: const EdgeInsets.all(14),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "#${bookingBean.orderNumber!}",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  bookingBean.roomInfos?.hotelName ?? "",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  bookingBean.roomInfos?.roomTitle ?? "",
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 10),
+
+                                Row(
+                                  children: [
+                                    Icon(Icons.king_bed, size: 12, color: Colors.teal),
+                                    SizedBox(width: 4),
+                                    Text("${bookingBean.rooms} Room", style: TextStyle(fontSize: 10)),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 10),
+
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "${ApiConstants.currency}${bookingBean.grandTotal ?? 0}",
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.teal,
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.calendar_month, size: 16, color: Colors.teal),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          TimeUtils.convertUTC(bookingBean.createdAt!),
+                                          style: const TextStyle(fontSize: 13, color: Colors.black54),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // 🔸 CENTER "CANCELLED" ICON
+                  Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(18),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.cancel,
+                              size: 60,
+                              color: Colors.red,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            "Booking Cancelled",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              )
+                  : /** Normal layout below */
+              Container(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -133,6 +305,17 @@ class _HotelMyBookingPageState extends StateMVC<HotelMyBookingPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            "#${bookingBean.orderNumber!}",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
                           // Hotel name
                           Text(
                             bookingBean.roomInfos?.hotelName ?? "Hotel Name",
@@ -216,7 +399,8 @@ class _HotelMyBookingPageState extends StateMVC<HotelMyBookingPage> {
                     ),
                   ],
                 ),
-              ),
+              )
+              ,
             );
           },
         )

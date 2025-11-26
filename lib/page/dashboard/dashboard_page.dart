@@ -107,6 +107,7 @@ class _DashboardPageState extends StateMVC<DashboardPage>  with WidgetsBindingOb
     requestNotificationPermissions();
   }
 
+
   void requestNotificationPermissions() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     NotificationSettings settings = await messaging.requestPermission(
@@ -182,6 +183,7 @@ class _DashboardPageState extends StateMVC<DashboardPage>  with WidgetsBindingOb
                   InkWell(
                     onTap: (){
                       _scaffoldKey.currentState!.openDrawer();
+                      _con.getProfile(context);
                     },
                       child: Padding(
                         padding: const EdgeInsets.all(2.0),

@@ -62,6 +62,20 @@ class HotelController extends ControllerMVC{
     notifyListeners();
   }
 
+  String selectedSort = "Low to High";
+  double selectedMin = 0;
+  double selectedMax = 5000;
+
+  void clearPriceFilters(BuildContext context) {
+    selectedSort = "Low to High";
+    selectedMin = 0;
+    selectedMax = 5000;
+    notifyListeners();
+    hotelList.clear();
+    getHotels(context);
+    Navigator.pop(context);
+  }
+
   void applyPriceFilter(String sortOrder, double minPrice, double maxPrice) {
     // Sort logic
     hotelList.sort((a, b) {
@@ -81,7 +95,9 @@ class HotelController extends ControllerMVC{
     notifyListeners();
   }
 
-  void applyRatingFilter(List<int> selectedRatings) {
+  List<int> selectedRatings = [];
+
+  void applyRatingFilter() {
     if (selectedRatings.isEmpty) {
       hotelList = List.from(allHotelList);
     } else {
@@ -89,18 +105,51 @@ class HotelController extends ControllerMVC{
           .where((hotel) => selectedRatings.contains(hotel.stars))
           .toList();
     }
+
     notifyListeners();
   }
 
+  void clearRatingFilter(BuildContext context) {
+    selectedRatings.clear();
+    hotelList = List.from(allHotelList);
+    Navigator.pop(context);
+    notifyListeners();
+  }
+
+  double selectedMinDistance = 0;
+  double selectedMaxDistance = 100;
+
   void applyDistanceFilter(double minKm, double maxKm) {
-    // Example: filter your hotelList based on distance range
-    final filtered = hotelList.where((hotel) {
-      final distance = double.tryParse(hotel.distance ?? "0") ?? 0;
+    selectedMinDistance = minKm;
+    selectedMaxDistance = maxKm;
+
+    hotelList = allHotelList.where((hotel) {
+      // Remove "km", extra spaces, convert to lowercase
+      String raw = hotel.distance
+          ?.toLowerCase()
+          .replaceAll("km", "")
+          .trim() ??
+          "0";
+
+      // Convert to double
+      final distance = double.tryParse(raw) ?? 0;
+
+      print("Parsed distance: $distance");
+
       return distance >= minKm && distance <= maxKm;
     }).toList();
 
-    hotelList = filtered;
     notifyListeners();
+  }
+
+
+
+  void clearDistanceFilter(BuildContext context) {
+    selectedMinDistance = 0;
+    selectedMaxDistance = 100;
+    hotelList = List.from(allHotelList);
+    notifyListeners();
+    Navigator.pop(context);
   }
 
 
@@ -219,13 +268,19 @@ class HotelController extends ControllerMVC{
   DateTime? checkOut;
   int nights = 0;
   List<String>? amenitiesList;
+  bool canCancel = true;
+
   myBookingDetails(BuildContext context,String roomId) async {
     Loader.show();
     await apiService.myBookingDetails(roomId).then((value) async {
       Loader.hide();
       bookingDetailsData = value.data!;
-      checkInn = DateFormat("dd-MM-yyyy").parse(bookingDetailsData.details!.checkInDate!);
-      checkOut = DateFormat("dd-MM-yyyy").parse(bookingDetailsData.details!.checkOutDate!);
+      checkInn = DateFormat("yyyy-MM-dd").parse(bookingDetailsData.details!.checkInDate!);
+      checkOut = DateFormat("yyyy-MM-dd").parse(bookingDetailsData.details!.checkOutDate!);
+      if (checkInn != null) {
+        canCancel = isCancelAllowed(bookingDetailsData.details!.checkInDate!);
+        setState(() {});
+      }
       nights = checkOut!.difference(checkInn!).inDays;
       amenitiesList = List<String>.from(jsonDecode(bookingDetailsData.roomContentInfo!.amenities!));
     }).catchError((e){
@@ -233,6 +288,29 @@ class HotelController extends ControllerMVC{
       Loader.hide();
     });
     notifyListeners();
+  }
+
+  bool isCancelAllowed(String checkInDateString) {
+    try {
+      // Parse check-in date
+      DateTime checkInDate = DateTime.parse(checkInDateString);
+
+      // Add fixed check-in time (11:00 AM)
+      DateTime checkInDateTime = DateTime(
+        checkInDate.year,
+        checkInDate.month,
+        checkInDate.day,
+        11, // 11 AM cutoff time
+        0,
+        0,
+      );
+
+      DateTime now = DateTime.now();
+
+      return now.isBefore(checkInDateTime); // true → allowed
+    } catch (e) {
+      return true; // fallback
+    }
   }
 
   var zoneInformationModel = ZoneInformationModel();
@@ -251,6 +329,18 @@ class HotelController extends ControllerMVC{
       }else{
         //ValidationUtils.showAppToast("Something wrong");
       }
+    }).catchError((e){
+      print(e);
+      Loader.hide();
+    });
+    notifyListeners();
+  }
+
+  cancelBooking(BuildContext context, String id) async {
+    Loader.show();
+    await apiService.cancelBooking(id).then((value) async {
+      Loader.hide();
+      PageNavigation.gotoHotelSuccessPage(context);
     }).catchError((e){
       print(e);
       Loader.hide();

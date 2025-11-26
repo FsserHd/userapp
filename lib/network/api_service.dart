@@ -997,6 +997,23 @@ class ApiService {
     }
   }
 
+  Future<HotelBookingResponse> cancelBooking(String id) async {
+    try {
+      String? userId = await PreferenceUtils.getUserId();
+      final response = await dioClient.get(
+          ApiConstants.cancelbooking + "$id");
+      if (response.statusCode == 200) {
+        return HotelBookingResponse.fromJson(response.data);
+      } else {
+        throw Exception(
+            'Failed to sign in. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error during sign in: $e');
+      throw e;
+    }
+  }
+
 
   final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
 

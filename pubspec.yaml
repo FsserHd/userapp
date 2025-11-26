@@ -83,6 +83,8 @@ dependencies:
   package_info_plus: ^4.0.0
   google_places_flutter: ^2.1.0
   google_places_autocomplete_text_field: ^1.1.0
+  html: ^0.15.0
+
 
 dependency_overrides:
   geolocator_android: 4.2.0

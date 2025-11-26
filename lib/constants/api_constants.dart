@@ -65,6 +65,7 @@ class ApiConstants{
   static var mybooking = HOTEL_BASE_URL+"mybooking";
   static var bookingdetails = HOTEL_BASE_URL+"bookingdetails";
   static var getzoneid = HOTEL_BASE_URL+"getzoneid/";
+  static var cancelbooking = HOTEL_BASE_URL+"cancelbooking/";
 
 
 }

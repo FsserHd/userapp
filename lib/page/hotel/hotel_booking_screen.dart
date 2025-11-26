@@ -202,7 +202,9 @@ class _HotelBookingScreenState extends State<HotelBookingScreen> {
                             ),
                           ).then((value){
                             setState(() {
-                              location = value;
+                              if(value!=null) {
+                                location = value;
+                              }
                             });
                           });
                         }

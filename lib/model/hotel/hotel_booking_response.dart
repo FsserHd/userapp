@@ -72,6 +72,7 @@ class HotelBookingData {
   String? createdAt;
   String? updatedAt;
   RoomInfos? roomInfos;
+  int? isCancel;
 
   HotelBookingData(
       {this.id,
@@ -114,7 +115,7 @@ class HotelBookingData {
         this.invoice,
         this.createdAt,
         this.updatedAt,
-        this.roomInfos,this.rooms,this.nights});
+        this.roomInfos,this.rooms,this.nights,this.isCancel});
 
   HotelBookingData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -159,6 +160,7 @@ class HotelBookingData {
     invoice = json['invoice'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    isCancel = json['is_cancel'];
     roomInfos = json['roomInfos'] != null
         ? new RoomInfos.fromJson(json['roomInfos'])
         : null;

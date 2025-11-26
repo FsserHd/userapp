@@ -14,6 +14,7 @@ import '../../constants/app_style.dart';
 import '../../controller/hotel_controller.dart';
 import '../../model/hotel/hotel_booking_response.dart';
 import '../../navigation/page_navigation.dart';
+import '../../utils/validation_utils.dart';
 
 class HotelMyBookingDetailsPage extends StatefulWidget {
   HotelBookingData bookingBean;
@@ -45,10 +46,15 @@ class _HotelMyBookingDetailsPageState extends StateMVC<HotelMyBookingDetailsPage
   late GoogleMapController mapController;
   final _placesApiKey = 'AIzaSyBRxE8E6WSJaIzLPx7zpGHEbo5djXx3bTY'; // Replace with your API key
   LatLng? vendorAddress;
+  bool canCancel = true;
+
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
+
+
+
 
 
   @override
@@ -61,7 +67,12 @@ class _HotelMyBookingDetailsPageState extends StateMVC<HotelMyBookingDetailsPage
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(widget.bookingBean.roomInfos!.hotelName!,style: TextStyle(color: Colors.white,fontFamily: AppStyle.robotoRegular,fontSize: 16),),
+        title: Column(
+          children: [
+            Text(widget.bookingBean.roomInfos!.hotelName!,style: TextStyle(color: Colors.white,fontFamily: AppStyle.robotoRegular,fontSize: 16),),
+            Text("#${widget.bookingBean.orderNumber!}",style: TextStyle(color: Colors.white,fontFamily: AppStyle.robotoRegular,fontSize: 12),),
+          ],
+        ),
         centerTitle: true,
         actions: [
           InkWell(
@@ -353,7 +364,7 @@ class _HotelMyBookingDetailsPageState extends StateMVC<HotelMyBookingDetailsPage
                           _buildDateBox(
                             context,
                             title: "Check-In",
-                            date: DateFormat("dd MMM yyyy").format(_con.checkInn!) + " 11:00 AM",
+                            date: DateFormat("dd MMM yyyy").format(_con.checkInn!),
                             icon: Icons.login_rounded,
                           ),
                           SizedBox(width: 2,),
@@ -366,7 +377,7 @@ class _HotelMyBookingDetailsPageState extends StateMVC<HotelMyBookingDetailsPage
                           _buildDateBox(
                             context,
                             title: "Check-Out",
-                            date: DateFormat("dd MMM yyyy").format(_con.checkOut!)+ " 10:00 AM",
+                            date: DateFormat("dd MMM yyyy").format(_con.checkOut!),
                             icon: Icons.logout_rounded,
                           ),
                         ],
@@ -466,7 +477,49 @@ class _HotelMyBookingDetailsPageState extends StateMVC<HotelMyBookingDetailsPage
                     );
                   },
                 ),
+              ),
+              SizedBox(height: 10,),
+              Text(
+                "Description",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 5,),
+              Text(
+                ValidationUtils.parseHtmlToText(_con.bookingDetailsData.roomContentInfo!.description ?? ""),
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 10,),
+              if(_con.canCancel)
+              InkWell(
+                onTap: (){
+                  _con.cancelBooking(context, widget.bookingBean.id.toString());
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Cancel Booking",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
               )
+
             ],
           ):Container()
         ),

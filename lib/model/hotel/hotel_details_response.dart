@@ -105,8 +105,6 @@ class Rooms {
   int? vendorId;
   String? featureImage;
   int? averageRating;
-  Null? latitude;
-  Null? longitude;
   int? status;
   int? bed;
   String? minPrice;
@@ -116,9 +114,9 @@ class Rooms {
   int? bathroom;
   int? numberOfRoomsOfThisSameType;
   int? preparationTime;
+  String? description;
   int? area;
   String? prices;
-  Null? additionalService;
   String? createdAt;
   String? updatedAt;
   String? roomTitle;
@@ -142,8 +140,7 @@ class Rooms {
         this.vendorId,
         this.featureImage,
         this.averageRating,
-        this.latitude,
-        this.longitude,
+        this.description,
         this.status,
         this.bed,
         this.minPrice,
@@ -155,7 +152,6 @@ class Rooms {
         this.preparationTime,
         this.area,
         this.prices,
-        this.additionalService,
         this.createdAt,
         this.updatedAt,
         this.roomTitle,
@@ -178,8 +174,8 @@ class Rooms {
     vendorId = json['vendor_id'];
     featureImage = json['feature_image'];
     averageRating = json['average_rating'];
-    latitude = json['latitude'];
-    longitude = json['longitude'];
+    description = json['description'];
+
     status = json['status'];
     bed = json['bed'];
     minPrice = json['min_price'];
@@ -191,7 +187,6 @@ class Rooms {
     preparationTime = json['preparation_time'];
     area = json['area'];
     prices = json['prices'];
-    additionalService = json['additional_service'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     roomTitle = json['roomTitle'];
@@ -222,8 +217,7 @@ class Rooms {
     data['vendor_id'] = this.vendorId;
     data['feature_image'] = this.featureImage;
     data['average_rating'] = this.averageRating;
-    data['latitude'] = this.latitude;
-    data['longitude'] = this.longitude;
+
     data['status'] = this.status;
     data['bed'] = this.bed;
     data['min_price'] = this.minPrice;
@@ -236,7 +230,6 @@ class Rooms {
     data['preparation_time'] = this.preparationTime;
     data['area'] = this.area;
     data['prices'] = this.prices;
-    data['additional_service'] = this.additionalService;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     data['roomTitle'] = this.roomTitle;

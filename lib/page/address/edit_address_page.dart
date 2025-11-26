@@ -62,6 +62,7 @@ class _EditAddressPageState extends StateMVC<EditAddressPage> {
         Placemark place = placemarks[0];
         setState(() {
           _address = "${place.street}, ${place.locality}, ${place.country}";
+          print(_address);
         });
       }
     } catch (e) {

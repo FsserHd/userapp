@@ -202,7 +202,7 @@ class _HotelVendorDetailsPageState extends StateMVC<HotelVendorDetailsPage> {
               roomBean.nights = (checkOut.difference(checkIn).inDays)-1;
               return InkWell(
                 onTap: () {
-                  if(roomBean.hourlyPrices!.length!=1) {
+                  if(roomBean.hourlyPrices!.isNotEmpty) {
                     widget.bookingRequest.checkInDate = TimeUtils.convertddMMyyyy(roomBean.hourlyPrices![0].date!);
                     widget.bookingRequest.nights = roomBean.hourlyPrices!.length;
                     widget.bookingRequest.price  = ((double.parse(roomBean.minPrice!).round() * (roomBean.hourlyPrices!.length))* widget.bookingRequest.rooms!);
@@ -216,7 +216,7 @@ class _HotelVendorDetailsPageState extends StateMVC<HotelVendorDetailsPage> {
                 },
                 borderRadius: BorderRadius.circular(16),
                 child: Card(
-                  color: roomBean.hourlyPrices!.isEmpty ? Colors.grey : Colors.white,
+                  color: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18),
                   ),
@@ -239,9 +239,9 @@ class _HotelVendorDetailsPageState extends StateMVC<HotelVendorDetailsPage> {
                                       return ClipRRect(
                                         borderRadius: BorderRadius.circular(0),
                                         child: ColorFiltered(
-                                          colorFilter: roomBean.hourlyPrices!.length == 1
-                                              ? const ColorFilter.mode(Colors.grey, BlendMode.saturation)
-                                              : const ColorFilter.mode(Colors.transparent, BlendMode.multiply),
+                                          colorFilter:
+                                              const ColorFilter.mode(Colors.grey, BlendMode.multiply)
+                                              ,
                                           child: Image.network(
                                             e,
                                             width: double.infinity,

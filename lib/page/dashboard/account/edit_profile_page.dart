@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
 import 'package:userapp/constants/app_colors.dart';
@@ -151,41 +152,52 @@ class _EditProfilePageState extends StateMVC<EditProfilePage> {
                             ),
                           ),
                           SizedBox(height: 10,),
-                          Container(
-                            height: 52,
-                            child: TextFormField(
-                              controller: _con.mobileController,
-                              keyboardType: TextInputType.text,
-                              decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.grey[200], // Gray fill color
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey,
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey,
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey,
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  hintText: 'Enter Mobile Number',
-                                  hintStyle: AppStyle.font14MediumBlack87.override(color: Colors.black)
+                      Container(
+                        height: 52,
+                        child: TextFormField(
+                          controller: _con.mobileController,
+                          enabled: false, // 🔥 DISABLE TEXTFIELD
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(10),
+                          ],
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              borderSide: BorderSide(
+                                color: Colors.grey,
+                                width: 1.0,
                               ),
                             ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              borderSide: BorderSide(
+                                color: Colors.grey,
+                                width: 1.0,
+                              ),
+                            ),
+                            disabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              borderSide: BorderSide(
+                                color: Colors.grey, // You can make it light grey if needed
+                                width: 1.0,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              borderSide: BorderSide(
+                                color: Colors.grey,
+                                width: 1.0,
+                              ),
+                            ),
+                            hintText: 'Enter Mobile Number',
+                            hintStyle: AppStyle.font14MediumBlack87.override(color: Colors.black),
                           ),
-                          SizedBox(height: 10,),
+                        ),
+                      ),
+                      SizedBox(height: 10,),
                           Container(
                             height: 52,
                             child: TextFormField(

@@ -67,7 +67,7 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
                       const SizedBox(width: 8),
                       _buildFilterChip("Rating", Icons.star, onTap: () {
                         // open rating filter modal
-                        _showRatingFilterSheet(context,_con.hotelList);
+                        _showRatingFilterSheet(context);
                       }),
                       const SizedBox(width: 8),
                       _buildFilterChip("Distance", Icons.place_outlined, onTap: () {
@@ -322,11 +322,13 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
   }
 
   void _showPriceFilterSheet(BuildContext context) {
+    // Load saved values from controller
+    double selectedMin = _con.selectedMin;
+    double selectedMax = _con.selectedMax;
+    String selectedSort = _con.selectedSort;
+
     double minPrice = 0;
     double maxPrice = 10000;
-    double selectedMin = 0;
-    double selectedMax = 5000;
-    String selectedSort = "Low to High";
 
     showModalBottomSheet(
       context: context,
@@ -354,10 +356,33 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
                       ),
                     ),
                   ),
-                  const Text(
-                    "Filter by Price",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+
+                  /// Title + Clear button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Filter by Price",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedSort = "Low to High";
+                            selectedMin = 0;
+                            selectedMax = 5000;
+                          });
+
+                          _con.clearPriceFilters(context); // Reset logic in controller
+                        },
+                        child: const Text(
+                          "Clear",
+                          style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
                   ),
+
                   const SizedBox(height: 20),
 
                   // 🔽 Sort options
@@ -381,8 +406,9 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
 
                   const SizedBox(height: 24),
 
-                  // 💸 Range Slider
-                  const Text("Price Range (₹)", style: TextStyle(fontWeight: FontWeight.w600)),
+                  const Text("Price Range (₹)",
+                      style: TextStyle(fontWeight: FontWeight.w600)),
+
                   RangeSlider(
                     values: RangeValues(selectedMin, selectedMax),
                     min: minPrice,
@@ -411,7 +437,7 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
 
                   const SizedBox(height: 30),
 
-                  // ✅ Apply Button
+                  // APPLY BUTTON
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -423,11 +449,20 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: () {
-                        Navigator.pop(context);
+                        // Save values
+                        _con.selectedSort = selectedSort;
+                        _con.selectedMin = selectedMin;
+                        _con.selectedMax = selectedMax;
+
+                        // Apply filter
                         _con.applyPriceFilter(selectedSort, selectedMin, selectedMax);
+
+                        Navigator.pop(context);
                       },
-                      child: const Text("Apply Filter",
-                          style: TextStyle(color: Colors.white, fontSize: 16)),
+                      child: const Text(
+                        "Apply Filter",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                     ),
                   ),
                 ],
@@ -439,10 +474,11 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
     );
   }
 
-  void _showRatingFilterSheet(BuildContext context, List<Hotels> hotelList) {
-
+  void _showRatingFilterSheet(BuildContext context) {
+    // ⭐ Always use ALL hotel list for rating options
     final ratingCount = <int, int>{};
-    for (var h in hotelList) {
+
+    for (var h in _con.allHotelList) {
       if (h.stars != null) {
         ratingCount[h.stars!] = (ratingCount[h.stars!] ?? 0) + 1;
       }
@@ -457,8 +493,8 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
     }).toList()
       ..sort((a, b) => ((b["value"] ?? 0) as int).compareTo((a["value"] ?? 0) as int));
 
-    // Track selected ratings
-    List<int> selectedRatings = [];
+    // load saved selected stars
+    List<int> selectedRatings = List.from(_con.selectedRatings);
 
     showModalBottomSheet(
       context: context,
@@ -486,60 +522,76 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
                       ),
                     ),
                   ),
-                  const Text(
-                    "Filter by Rating",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+
+                  /// Title + Clear button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Filter by Rating",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedRatings.clear();
+                          });
+                          _con.clearRatingFilter(context);
+                        },
+                        child: const Text("Clear",
+                            style: TextStyle(color: Colors.red)),
+                      ),
+                    ],
                   ),
+
                   const SizedBox(height: 16),
 
-                  // 🔹 Dynamic list of ratings
-                  if (ratingOptions.isEmpty)
-                    const Text("No rating data available", style: TextStyle(color: Colors.grey))
-                  else
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: ratingOptions.length,
-                      itemBuilder: (context, index) {
-                        final item = ratingOptions[index];
-                        final isSelected = selectedRatings.contains(item["value"]);
+                  // ⭐ Rating options
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: ratingOptions.length,
+                    itemBuilder: (context, index) {
+                      final item = ratingOptions[index];
+                      final ratingValue = item["value"] as int;
+                      final isSelected = selectedRatings.contains(ratingValue);
 
-                        return ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: Icon(
-                            Icons.star,
-                            color: isSelected ? Colors.amber : Colors.grey,
-                          ),
-                          title: Text("${item["label"]} (${item["count"]})"),
-                          trailing: Checkbox(
-                            value: isSelected,
-                            activeColor: Colors.teal,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                final ratingValue = item["value"] as int;
-                                if (value == true) {
-                                  selectedRatings.add(ratingValue);
-                                } else {
-                                  selectedRatings.remove(ratingValue);
-                                }
-                              });
-                            },
-                          ),
-                          onTap: () {
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(
+                          Icons.star,
+                          color: isSelected ? Colors.amber : Colors.grey,
+                        ),
+                        title: Text("${item["label"]} (${item["count"]})"),
+                        trailing: Checkbox(
+                          value: isSelected,
+                          activeColor: Colors.teal,
+                          onChanged: (value) {
                             setState(() {
-                              if (isSelected) {
+                              if (value == true) {
+                                selectedRatings.add(ratingValue);
                               } else {
-                                selectedRatings.add(item["value"] as int);
+                                selectedRatings.remove(ratingValue);
                               }
                             });
                           },
-                        );
-                      },
-                    ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            if (isSelected) {
+                              selectedRatings.remove(ratingValue);
+                            } else {
+                              selectedRatings.add(ratingValue);
+                            }
+                          });
+                        },
+                      );
+                    },
+                  ),
 
                   const SizedBox(height: 20),
 
-                  // Apply Button
+                  /// Apply button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -551,13 +603,12 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: () {
+                        _con.selectedRatings = List.from(selectedRatings);
+                        _con.applyRatingFilter();
                         Navigator.pop(context);
-                        _con.applyRatingFilter(selectedRatings);
                       },
-                      child: const Text(
-                        "Apply Filter",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
+                      child: const Text("Apply Filter",
+                          style: TextStyle(color: Colors.white)),
                     ),
                   ),
                 ],
@@ -570,9 +621,11 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
   }
 
 
+
   void showDistanceFilterSheet(BuildContext context) {
-    double minDistance = 0;
-    double maxDistance = 100;
+    // Load saved values
+    double minDistance = _con.selectedMinDistance;
+    double maxDistance = _con.selectedMaxDistance;
 
     showModalBottomSheet(
       context: context,
@@ -600,13 +653,36 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
                       ),
                     ),
                   ),
-                  const Text(
-                    "Filter by Distance",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+
+                  /// Title + Clear button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Filter by Distance",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            minDistance = 0;
+                            maxDistance = 100;
+                          });
+                          _con.clearDistanceFilter(context);
+                        },
+                        child: const Text(
+                          "Clear",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
                   ),
+
                   const SizedBox(height: 16),
 
-                  // 🔹 Range bar (0–100 km)
+                  /// Range Slider
                   RangeSlider(
                     values: RangeValues(minDistance, maxDistance),
                     min: 0,
@@ -614,8 +690,8 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
                     divisions: 20,
                     activeColor: Colors.teal,
                     labels: RangeLabels(
-                      "${minDistance.toStringAsFixed(0)} km",
-                      "${maxDistance.toStringAsFixed(0)} km",
+                      "${minDistance.round()} km",
+                      "${maxDistance.round()} km",
                     ),
                     onChanged: (RangeValues values) {
                       setState(() {
@@ -626,16 +702,18 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
                   ),
 
                   const SizedBox(height: 10),
+
                   Center(
                     child: Text(
-                      "Selected Range: ${minDistance.toStringAsFixed(0)} km - ${maxDistance.toStringAsFixed(0)} km",
-                      style: const TextStyle(fontSize: 14, color: Colors.black54),
+                      "Selected Range: ${minDistance.round()} km - ${maxDistance.round()} km",
+                      style:
+                      const TextStyle(fontSize: 14, color: Colors.black54),
                     ),
                   ),
 
                   const SizedBox(height: 24),
 
-                  // 🔹 Apply Button
+                  /// APPLY BUTTON
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -644,16 +722,20 @@ class _HotelVendorsPageState extends StateMVC<HotelVendorsPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding:
+                        const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: () {
                         Navigator.pop(context);
-                        // Call your filter function here
-                        _con.applyDistanceFilter(minDistance, maxDistance);
+                        _con.applyDistanceFilter(
+                            minDistance, maxDistance);
                       },
                       child: const Text(
                         "Apply Filter",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),

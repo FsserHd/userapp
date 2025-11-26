@@ -11,6 +11,7 @@ import 'package:userapp/model/payment/payment_gateway_model.dart';
 import 'package:userapp/model/profile/profile_model.dart';
 import 'package:userapp/model/wallet/wallet_balance_response.dart';
 import 'package:userapp/model/wallet/wallet_transcation_model.dart';
+import 'package:userapp/page/dashboard/dashboard_page.dart';
 
 import '../constants/lang.dart';
 import '../model/login/login_model.dart';
@@ -38,6 +39,7 @@ class AuthController extends ControllerMVC{
   var dobController  =TextEditingController();
   var nameController  =TextEditingController();
   var genderType = "Select Gender";
+  DashboardPage dashboardPage = DashboardPage();
 
   //Network Service
   ApiService apiService = ApiService();

@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:userapp/constants/app_colors.dart';
 import 'package:userapp/main.dart';
 import 'package:userapp/navigation/navigation_service.dart';
-
+import 'package:html/parser.dart' as html_parser;
 import '../constants/app_style.dart';
 
 class ValidationUtils{
@@ -79,6 +79,13 @@ class ValidationUtils{
         ],
       ),
     );
+  }
+
+
+
+  static String parseHtmlToText(String html) {
+    final document = html_parser.parse(html);
+    return document.body?.text.trim() ?? '';
   }
 
 }

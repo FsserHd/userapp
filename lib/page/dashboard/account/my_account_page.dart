@@ -13,6 +13,7 @@ import 'package:userapp/controller/auth_controller.dart';
 import 'package:userapp/flutter_flow/flutter_flow_theme.dart';
 import 'package:userapp/navigation/page_navigation.dart';
 import 'package:userapp/page/dashboard/account/edit_profile_page.dart';
+import 'package:userapp/page/dashboard/dashboard_page.dart';
 
 import '../../../utils/validation_utils.dart';
 

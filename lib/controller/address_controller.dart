@@ -140,7 +140,7 @@ class AddressController extends ControllerMVC{
     if(type == "hotel"){
       apiService.getHotelZone(latitude,longitude).then((value){
         Loader.hide();
-        if(value.success!){
+        //if(value.success!){
           zoneResponseModel = value;
           if(zoneResponseModel.data == "no_matched"){
             ValidationUtils.showAppToast("Unfortunately, we do not provide service at that location at this time.");
@@ -156,9 +156,9 @@ class AddressController extends ControllerMVC{
             }
           }
           notifyListeners();
-        }else{
-          //ValidationUtils.showAppToast("Something wrong");
-        }
+        // }else{
+        //   //ValidationUtils.showAppToast("Something wrong");
+        // }
       }).catchError((e){
         print(e);
         Loader.hide();

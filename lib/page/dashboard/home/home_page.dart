@@ -142,7 +142,7 @@ class _HomePageState extends StateMVC<HomePage> {
                   crossAxisCount: 3, // Number of columns
                   crossAxisSpacing: 2, // Spacing between columns
                   mainAxisSpacing: 2, // Spacing between rows
-                  childAspectRatio: 0.77
+                  childAspectRatio: 0.55
                 ),
               itemCount: _con.homeModel.data!.category!.length,
 
@@ -152,7 +152,9 @@ class _HomePageState extends StateMVC<HomePage> {
                 onTap: (){
                   if(categoryBean.shopType == "4"){
                     PageNavigation.gotoServiceCategoryPage(context);
-                  }else {
+                  }else if(categoryBean.shopType == "5") {
+                    PageNavigation.gotoHotelBookingPage(context);
+                  }else{
                     PageNavigation.gotoVendorPage(context, categoryBean);
                   }
                 },
@@ -162,35 +164,77 @@ class _HomePageState extends StateMVC<HomePage> {
                     children: [
                       Container(
                         width: 100,
-                        height: 100,
+                        height: 150,
                         decoration: BoxDecoration(
-                          color: AppColors.dashboardShopTypeColor, // Gray background color
-                          borderRadius: BorderRadius.circular(10.0), // Rounded corners
-                        ),
-                        padding: EdgeInsets.all(10.0), // Padding for inner content
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.dashboardShopTypeColor, // White background color for inner container
-                            borderRadius: BorderRadius.circular(8.0), // Rounded corners for inner container
+                          borderRadius: BorderRadius.circular(12),
+                          image: DecorationImage(
+                            image: NetworkImage(categoryBean.coverImage!),
+                            fit: BoxFit.cover, // ✅ Fill full container
                           ),
-                          padding: EdgeInsets.all(10.0), // Padding for icon
-                          child: Image.network(categoryBean.coverImage!,height: 30,width: 30,),
+                        ),
+                        child: Stack(
+                          children: [
+                            // ⭐ Light white gradient shadow on top
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.white.withOpacity(0.5), // Light white top
+                                    Colors.white.withOpacity(0.0), // Fade to transparent
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            // ⭐ Bottom text
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,                     // White background
+                                    borderRadius: BorderRadius.circular(8),  // Rounded corners
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      )
+                                    ],
+                                  ),
+                                  child: Text(
+                                    categoryBean.title!,
+                                    textAlign: TextAlign.center,
+                                    style: AppStyle.font14MediumBlack87.override(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                ],
                         ),
                       ),
-                      SizedBox(height: 10,),
-                      Text(categoryBean.title!,style: AppStyle.font14MediumBlack87.override(color: Colors.black,fontSize: 10)),
                     ],
                   ),
                 ),
               );
             }),
             SizedBox(height: 10,),
-            InkWell(
-                onTap: (){
-                  PageNavigation.gotoHotelBookingPage(context);
-                },
-                child: Image.asset("assets/images/img.png",)),
-            SizedBox(height: 20,),
+            // InkWell(
+            //     onTap: (){
+            //       PageNavigation.gotoHotelBookingPage(context);
+            //     },
+            //     child: Image.asset("assets/images/img.png",)),
+            // SizedBox(height: 20,),
+            if(_con.vendorList.isNotEmpty)
             InkWell(
                 onTap:() {
 

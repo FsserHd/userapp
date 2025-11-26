@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:geocoding/geocoding.dart';
@@ -63,6 +64,28 @@ class _MapPageState extends StateMVC<MapPage> {
         setState(() {
           _selectedPosition = latLng;
         });
+
+        setState(() {
+          _selectedPosition = latLng;
+          _con.serviceCheckZone(context, latLng.latitude.toString(), latLng.longitude.toString(),widget.type);
+        });
+        try {
+          // Get the address using the geocoding package
+          List<Placemark> placemarks = await placemarkFromCoordinates(
+            latLng.latitude,
+            latLng.longitude,
+          );
+
+          // If the placemark is found, update the address
+          if (placemarks.isNotEmpty) {
+            Placemark place = placemarks[0];
+            setState(() {
+              _address = "${place.street}, ${place.locality}, ${place.country}";
+            });
+          }
+        } catch (e) {
+          print(e);
+        }
 
         mapController.animateCamera(
           CameraUpdate.newCameraPosition(
@@ -165,6 +188,9 @@ class _MapPageState extends StateMVC<MapPage> {
                     Container(
                       height: 50,
                       child: TextFormField(
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(10),
+                          ],
                         onChanged: (e){
                           _con.addressModel.mobile = e;
                         },

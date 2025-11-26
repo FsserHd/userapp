@@ -56,6 +56,7 @@ class HomeController extends ControllerMVC{
   var categoryModel = CategoryModel();
   var commonResponseModel = CommonResponseModel();
   var zoneResponseModel = ZoneResponseModel();
+  var hotelZoneResponseModel = ZoneResponseModel();
   var productModel = ProductModel();
   var profileModel = ProfileModel();
   var chatResponse = ChatResponse();
@@ -74,6 +75,7 @@ class HomeController extends ControllerMVC{
   LatLng? shippingAddress;
   List<VendorData> vendorList = [];
   final Set<Polyline> polylines = {};
+  List<ZoneData> zoneList = [];
 
   filterVendor(String s,String action){
     vendorList.clear();
@@ -140,52 +142,64 @@ class HomeController extends ControllerMVC{
 
             homeModel = value;
             PreferenceUtils.saveFCode(homeModel.data!.fCode!.fCode!);
-            List<Future<void>> futures = []; // To keep track of async operations.
-            String? latitude = await PreferenceUtils.getLatitude();
-            String? longitude = await PreferenceUtils.getLongitude();
-            String origin = "${latitude},${longitude}";
-            // Use a for-loop instead of forEach
-            for (var element in homeModel.data!.vendor!) {
-              String destination = "${element.latitude},${element.longitude}";
+            if(homeModel.data!.vendor!.isNotEmpty) {
+              List<Future<void>> futures = [
+              ]; // To keep track of async operations.
+              String? latitude = await PreferenceUtils.getLatitude();
+              String? longitude = await PreferenceUtils.getLongitude();
+              String origin = "${latitude},${longitude}";
+              // Use a for-loop instead of forEach
+              for (var element in homeModel.data!.vendor!) {
+                String destination = "${element.latitude},${element.longitude}";
 
-              futures.add(getDistance(origin, destination, "AIzaSyBRxE8E6WSJaIzLPx7zpGHEbo5djXx3bTY").then((value) {
-                element.distance1 = distance;
-                element.distance = distance;
-                element.duration = duration;
-                vendorList.add(element);
-              }));
-            }
-            await Future.wait(futures); // Wait for all async operations to complete.
-            // Sort vendors: First by live status, then by distance.
-            vendorList.sort((a, b) {
-              // Ensure live vendors come first
-              if (a.livestatus == "true" && b.livestatus == "false") return -1;
-              if (a.livestatus == "false" && b.livestatus == "true") return 1;
-
-              // Function to extract numeric distance
-              double extractDistance(String? distance) {
-                if (distance == null) return double.infinity; // Place null values at the end
-                return double.tryParse(distance.replaceAll(RegExp(r'[^0-9.]'), '')) ?? double.infinity;
+                futures.add(getDistance(origin, destination,
+                    "AIzaSyBRxE8E6WSJaIzLPx7zpGHEbo5djXx3bTY").then((value) {
+                  element.distance1 = distance;
+                  element.distance = distance;
+                  element.duration = duration;
+                  vendorList.add(element);
+                }));
               }
+              await Future.wait(
+                  futures); // Wait for all async operations to complete.
+              // Sort vendors: First by live status, then by distance.
+              vendorList.sort((a, b) {
+                // Ensure live vendors come first
+                if (a.livestatus == "true" && b.livestatus == "false")
+                  return -1;
+                if (a.livestatus == "false" && b.livestatus == "true") return 1;
 
-              double distanceA = extractDistance(a.distance1);
-              double distanceB = extractDistance(b.distance1);
+                // Function to extract numeric distance
+                double extractDistance(String? distance) {
+                  if (distance == null)
+                    return double.infinity; // Place null values at the end
+                  return double.tryParse(
+                      distance.replaceAll(RegExp(r'[^0-9.]'), '')) ??
+                      double.infinity;
+                }
 
-              // Sort in ascending order of distance
-              return distanceA.compareTo(distanceB);
-            });
+                double distanceA = extractDistance(a.distance1);
+                double distanceB = extractDistance(b.distance1);
+
+                // Sort in ascending order of distance
+                return distanceA.compareTo(distanceB);
+              });
 
 
-            // vendorList.sort((a, b) {
-            //     if (a.livestatus == "true" && b.livestatus == "false") {
-            //       return -1;
-            //     } else if (a.livestatus == "false" && b.livestatus == "true") {
-            //       return 1;
-            //     }
-            //     return a.distance1!.compareTo(b.distance1!);
-            // });
-            await Future.wait(futures); // Wait for all async operations to complete.
-            listVendorTypes();
+              // vendorList.sort((a, b) {
+              //     if (a.livestatus == "true" && b.livestatus == "false") {
+              //       return -1;
+              //     } else if (a.livestatus == "false" && b.livestatus == "true") {
+              //       return 1;
+              //     }
+              //     return a.distance1!.compareTo(b.distance1!);
+              // });
+              await Future.wait(
+                  futures); // Wait for all async operations to complete.
+              listVendorTypes();
+            }else{
+
+            }
           notifyListeners();
         } else {
          // ValidationUtils.showAppToast("Something wrong");
@@ -559,13 +573,8 @@ class HomeController extends ControllerMVC{
       Loader.hide();
       if(value.success!){
         zoneResponseModel = value;
-        if(zoneResponseModel.data == "no_matched"){
-          PreferenceUtils.saveZoneId('0');
-          _showInvalidZoneBottomSheet(context,currentLocation);
-        }else{
-          PreferenceUtils.saveZoneId(zoneResponseModel.data!);
-          PageNavigation.gotoDashboard(context);
-        }
+        zoneList.addAll(zoneResponseModel.zonedata!);
+        getHotelZone(context, latitude, longitude, currentLocation);
         notifyListeners();
       }else{
        // ValidationUtils.showAppToast("Something wrong");
@@ -575,41 +584,92 @@ class HomeController extends ControllerMVC{
       Loader.hide();
     });
   }
-  void _showInvalidZoneBottomSheet(BuildContext context, String currentLocation) {
+
+  List<ZoneData> removeDuplicateZoneByName(List<ZoneData> list) {
+    final Map<String, ZoneData> uniqueMap = {};
+
+    for (var zone in list) {
+      uniqueMap[zone.name!] = zone;
+    }
+
+    return uniqueMap.values.toList();
+  }
+
+
+
+
+  getHotelZone(BuildContext context,String latitude,String longitude, String currentLocation){
+    Loader.show();
+    apiService.getHotelZone(latitude,longitude).then((value) async {
+      Loader.hide();
+      if(value.success!){
+        hotelZoneResponseModel = value;
+        zoneList.addAll(hotelZoneResponseModel.zonedata!);
+        if(zoneResponseModel.data == "no_matched"){
+          PreferenceUtils.saveZoneId('0');
+          zoneList = await removeDuplicateZoneByName(zoneList);
+          _showInvalidZoneBottomSheet(context,currentLocation,zoneList);
+        }else{
+          PreferenceUtils.saveZoneId(zoneResponseModel.data!);
+          PageNavigation.gotoDashboard(context);
+        }
+        notifyListeners();
+      }else{
+        // ValidationUtils.showAppToast("Something wrong");
+      }
+    }).catchError((e){
+      print(e);
+      Loader.hide();
+    });
+  }
+
+
+  void _showInvalidZoneBottomSheet(BuildContext context, String currentLocation, List<ZoneData>? zonedata) {
     showModalBottomSheet(
       context: context,
+      isDismissible: false,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) {
-        return Container(
+        return Padding(
           padding: EdgeInsets.all(16.0),
-          height: 240,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Delivery Address',
-                style: AppStyle.font14MediumBlack87..override(fontSize: 18),
+                style: AppStyle.font14MediumBlack87.override(fontSize: 18),
               ),
               SizedBox(height: 10),
+
               Text(
                 currentLocation!,
                 style: TextStyle(fontSize: 16),
               ),
               SizedBox(height: 10),
+
               Center(
                 child: Text(
                   'Current not delivery this location',
-                  style: AppStyle.font14MediumBlack87..override(fontSize: 14,color: Colors.red),
+                  style: AppStyle.font14MediumBlack87.override(
+                    fontSize: 14,
+                    color: Colors.red,
+                  ),
                 ),
               ),
+
               SizedBox(height: 20),
+
+              // CHANGE LOCATION BUTTON
               InkWell(
-                onTap: (){
-                  // _con.createOrder(context);
-                  if(Platform.isAndroid) {
-                    PageNavigation.gotoAddressPage(context, "home").then((
-                        value) {
+                onTap: () {
+                  if (Platform.isAndroid) {
+                    PageNavigation.gotoAddressPage(context, "home").then((value) {
                       PreferenceUtils.getZoneId().then((zoneId) {
-                        print(zoneId);
                         if (zoneId != "0") {
                           Navigator.pop(context);
                           Navigator.pop(context);
@@ -617,7 +677,7 @@ class HomeController extends ControllerMVC{
                         }
                       });
                     });
-                  }else{
+                  } else {
                     PageNavigation.gotoSelectedLocationPage(context);
                   }
                 },
@@ -625,14 +685,82 @@ class HomeController extends ControllerMVC{
                   width: double.infinity,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.themeColor, // Gray fill color
-                    borderRadius: BorderRadius.circular(15.0), // Rounded corners
+                    color: AppColors.themeColor,
+                    borderRadius: BorderRadius.circular(15.0),
                   ),
                   child: Center(
-                    child:   Text("Change Location",style: AppStyle.font14MediumBlack87.override(color: Colors.white)),
+                    child: Text(
+                      "Change Location",
+                      style: AppStyle.font14MediumBlack87.override(color: Colors.white),
+                    ),
                   ),
                 ),
               ),
+
+              SizedBox(height: 20),
+              if(zonedata!.isNotEmpty)
+              Text(
+                'Please change a supported location, save your address, and continue enjoying our service',
+                style: AppStyle.font14MediumBlack87.override(fontSize: 14),
+              ),
+              if(zonedata!.isNotEmpty)
+              SizedBox(height: 10),
+              if(zonedata!.isNotEmpty)
+              /// THIS IS WHERE WE REPLACE LISTVIEW WITH GRIDVIEW
+              SizedBox(
+                height: 200, // Adjust height as needed
+                child: GridView.builder(
+                  itemCount: zonedata!.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,        // 2 columns
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 3.2,    // Better shape
+                  ),
+                  itemBuilder: (context, index) {
+                    return InkWell(
+                      onTap: (){
+                        if (Platform.isAndroid) {
+                          PageNavigation.gotoAddressPage(context, "home").then((value) {
+                            PreferenceUtils.getZoneId().then((zoneId) {
+                              if (zoneId != "0") {
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                PageNavigation.gotoDashboard(context);
+                              }
+                            });
+                          });
+                        } else {
+                          PageNavigation.gotoSelectedLocationPage(context);
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey.shade400,
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text(
+                            zonedata[index].name!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              if(zonedata!.isNotEmpty)
+              SizedBox(height: 20),
             ],
           ),
         );

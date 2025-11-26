@@ -25,9 +25,9 @@ class HomeModel {
 }
 
 class Data {
-  List<Banner>? banner;
-  List<Category>? category;
-  List<VendorData>? vendor;
+  List<Banner>? banner = [];
+  List<Category>? category =[];
+  List<VendorData>? vendor = [];
   FCode? fCode;
 
   Data({this.banner, this.category, this.vendor,this.fCode});

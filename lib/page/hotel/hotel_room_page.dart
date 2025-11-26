@@ -9,6 +9,7 @@ import 'package:mvc_pattern/mvc_pattern.dart';
 import 'package:userapp/model/hotel/booking_request.dart';
 import 'package:userapp/model/hotel/time_slot_response.dart';
 import 'package:userapp/navigation/page_navigation.dart';
+import 'package:userapp/utils/validation_utils.dart';
 
 import '../../constants/api_constants.dart';
 import '../../constants/app_colors.dart';
@@ -434,7 +435,7 @@ class _HotelRoomPageState extends StateMVC<HotelRoomPage> {
 
                           // 🔹 Nights Info
                           Center(
-                            child: Text(
+                            child:  Text(
                               "$nights ${nights > 1 ? 'Nights' : 'Night'} Stay",
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
@@ -546,7 +547,23 @@ class _HotelRoomPageState extends StateMVC<HotelRoomPage> {
                         );
                       },
                     ),
-                  )
+                  ),
+                  SizedBox(height: 10,),
+                  Text(
+                    "Description",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 5,),
+                Text(
+                  ValidationUtils.parseHtmlToText(widget.roomData.description ?? ""),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
+                )
                 ],
               ),
             ),

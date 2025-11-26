@@ -96,12 +96,33 @@ class _ServiceLocationPageState extends StateMVC<ServiceLocationPage> {
     try {
       List<geocoding.Location> locations = await geocoding.locationFromAddress(s);
       if (locations.isNotEmpty) {
-        final location = locations.first;
-        final latLng = LatLng(location.latitude, location.longitude);
+        final location1 = locations.first;
+        final latLng = LatLng(location1.latitude, location1.longitude);
 
         setState(() {
           _selectedPosition = latLng;
         });
+
+        setState(() {
+          _selectedPosition = latLng;
+          _con. request.fLatitude = latLng.latitude.toString();
+          _con.request.fLongitude = latLng.longitude.toString();
+          if(widget.type == "from") {
+            _con.serviceCheckZone(context, latLng.latitude.toString(),
+                latLng.longitude.toString(),widget.serviceType);
+          }
+        });
+
+        final geocodingResponse = await _geocoding.searchByLocation(
+          location.Location(lat: latLng.latitude, lng: latLng.longitude),
+        );
+
+        if (geocodingResponse.results.isNotEmpty) {
+          setState(() {
+            _address = geocodingResponse.results.first.formattedAddress ?? '';
+            _con.request.fromlocation  = _address;
+          });
+        }
 
         mapController.animateCamera(
           CameraUpdate.newCameraPosition(

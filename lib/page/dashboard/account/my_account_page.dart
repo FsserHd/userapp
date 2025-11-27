@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:userapp/constants/app_colors.dart';
 import 'package:userapp/constants/app_style.dart';
 import 'package:userapp/controller/auth_controller.dart';
@@ -199,7 +198,7 @@ class _MyAccountPageState extends StateMVC<MyAccountPage> {
                         padding: const EdgeInsets.all(8.0),
                         child: InkWell(
                           onTap: (){
-                            Share.share('App Link: https://thee4square.com/');
+                          //  Share.share('App Link: https://thee4square.com/');
                           },
                           child: Container(
                             width: double.infinity,

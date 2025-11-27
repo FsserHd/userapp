@@ -74,7 +74,7 @@ dependencies:
   flutter_exit_app: ^1.0.0
   overlay_support: ^2.1.0
   audioplayers:
-  share_plus:
+#  share_plus:
   whatsapp_unilink:
   webview_flutter: 4.4.0
   flutter_styled_toast: ^2.2.1

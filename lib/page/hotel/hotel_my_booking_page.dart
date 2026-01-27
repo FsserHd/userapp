@@ -11,6 +11,7 @@ import '../../constants/api_constants.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_style.dart';
 import '../../navigation/page_navigation.dart';
+import 'hotel_my_booking_details_page.dart';
 
 class HotelMyBookingPage extends StatefulWidget {
   const HotelMyBookingPage({super.key});
@@ -61,8 +62,14 @@ class _HotelMyBookingPageState extends StateMVC<HotelMyBookingPage> {
                 if(bookingBean.isCancel == 1){
                   ValidationUtils.showAppToast("Booking Cancelled");
                 }else {
-                  PageNavigation.gotoHotelMyBookingDetails(
-                      context, bookingBean);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HotelMyBookingDetailsPage(bookingBean),
+                    ),
+                  ).then((e){
+                    _con.myBooking(context);
+                  });
                 }
               },
               child:bookingBean.isCancel == 1

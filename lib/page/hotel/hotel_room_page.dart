@@ -576,7 +576,7 @@ class _HotelRoomPageState extends StateMVC<HotelRoomPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: Colors.black,
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(14),topRight: Radius.circular(14)),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
@@ -589,7 +589,6 @@ class _HotelRoomPageState extends StateMVC<HotelRoomPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // 💰 Price Section
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

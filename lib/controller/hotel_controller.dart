@@ -336,11 +336,11 @@ class HotelController extends ControllerMVC{
     notifyListeners();
   }
 
-  cancelBooking(BuildContext context, String id) async {
+  cancelBooking(BuildContext context, String id, String reason) async {
     Loader.show();
-    await apiService.cancelBooking(id).then((value) async {
+    await apiService.cancelBooking(id,reason).then((value) async {
       Loader.hide();
-      PageNavigation.gotoHotelSuccessPage(context);
+      Navigator.pop(context);
     }).catchError((e){
       print(e);
       Loader.hide();

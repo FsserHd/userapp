@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/geocoding.dart' as location;
-import 'package:google_places_autocomplete_text_field/google_places_autocomplete_text_field.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
+
 import 'package:mvc_pattern/mvc_pattern.dart';
 import 'package:userapp/flutter_flow/flutter_flow_theme.dart';
 import 'package:userapp/model/service/add_service_request.dart';
@@ -252,30 +253,49 @@ class _ServiceLocationPageState extends StateMVC<ServiceLocationPage> {
                                 ),
                               ),
                             ),
-                            child: GooglePlacesAutoCompleteTextFormField(
-                              maxLines: 1,
+                            child: GooglePlaceAutoCompleteTextField(
                               textEditingController: _searchController,
                               googleAPIKey: _placesApiKey,
                               debounceTime: 400,
-                              countries: ['in'],
-                              fetchCoordinates: true,
-                              onPlaceDetailsWithCoordinatesReceived: (prediction) {
+                              countries: const ["in"],
+                              isLatLngRequired: true,
+
+                              inputDecoration: InputDecoration(
+                                hintText: "Search location",
+                                prefixIcon: const Icon(Icons.location_on),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+
+                              getPlaceDetailWithLatLng: (prediction) {
                                 final lat = prediction.lat;
                                 final lng = prediction.lng;
-                                // _goToLocation(lat, lng);
+
+                                // Example usage
+                                // _con.serviceCheckZone(context, lat, lng);
                               },
-                              onSuggestionClicked: (prediction) {
-                                _searchController.text = prediction.description!;
-                               /* _con.serviceCheckZone(
-                                  context,
-                                  prediction.lat.toString(),
-                                  prediction.lng.toString(),
-                                );*/
-                                _searchAndNavigate(prediction.description!);
+
+                              itemClick: (prediction) {
+                                _searchController.text = prediction.description ?? "";
+                                _searchController.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: _searchController.text.length),
+                                );
+
+                                _searchAndNavigate(prediction.description ?? "");
                               },
+
+                              itemBuilder: (context, index, prediction) {
+                                return ListTile(
+                                  leading: const Icon(Icons.location_on),
+                                  title: Text(prediction.description ?? ""),
+                                );
+                              },
+
+                              seperatedBuilder: const Divider(),
+                              isCrossBtnShown: true,
                             ),
-                          )
-                          ,
+                          ),
                         ],
                         crossAxisAlignment: CrossAxisAlignment.start,
                       ),

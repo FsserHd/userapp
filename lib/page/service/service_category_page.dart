@@ -3,7 +3,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
 import 'package:userapp/flutter_flow/flutter_flow_theme.dart';
 import 'package:userapp/model/service/service_category_model.dart';

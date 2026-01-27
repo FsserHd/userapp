@@ -997,11 +997,11 @@ class ApiService {
     }
   }
 
-  Future<HotelBookingResponse> cancelBooking(String id) async {
+  Future<HotelBookingResponse> cancelBooking(String id, String reason) async {
     try {
       String? userId = await PreferenceUtils.getUserId();
       final response = await dioClient.get(
-          ApiConstants.cancelbooking + "$id");
+          ApiConstants.cancelbooking + "$id/$reason");
       if (response.statusCode == 200) {
         return HotelBookingResponse.fromJson(response.data);
       } else {

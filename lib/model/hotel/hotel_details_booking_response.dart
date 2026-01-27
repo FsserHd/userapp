@@ -327,6 +327,7 @@ class HotelContentInfo {
   int? cityId;
   String? title;
   String? slug;
+  String? mobileno;
   String? address;
   String? amenities;
   String? description;
@@ -347,7 +348,7 @@ class HotelContentInfo {
         this.address,
         this.amenities,
         this.description,
-
+        this.mobileno,
         this.createdAt,
         this.updatedAt});
 
@@ -362,6 +363,7 @@ class HotelContentInfo {
     title = json['title'];
     slug = json['slug'];
     address = json['address'];
+    mobileno = json['mobileno'];
     amenities = json['amenities'];
     description = json['description'];
 

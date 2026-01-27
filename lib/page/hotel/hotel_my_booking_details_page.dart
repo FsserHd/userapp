@@ -1,8 +1,10 @@
 
 
 
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:mvc_pattern/mvc_pattern.dart';
@@ -302,31 +304,63 @@ class _HotelMyBookingDetailsPageState extends StateMVC<HotelMyBookingDetailsPage
                     const SizedBox(width: 12),
 
                     // Right Side: Mini Map
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: SizedBox(
-                        height: 100,
-                        width: 100,
-                        child: GoogleMap(
-                          onMapCreated: _onMapCreated,
-                          zoomGesturesEnabled: false,
-                          scrollGesturesEnabled: false,
-                          tiltGesturesEnabled: false,
-                          rotateGesturesEnabled: false,
-                          initialCameraPosition: CameraPosition(
-                            target: vendorAddress!,
-                            zoom: 14.0,
-                          ),
-                          markers: {
-                            Marker(
-                              markerId: MarkerId(widget.bookingBean.roomInfos!.hotelName!),
-                              position: vendorAddress!,
+                    Column(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: SizedBox(
+                            height: 100,
+                            width: 100,
+                            child: GoogleMap(
+                              onMapCreated: _onMapCreated,
+                              zoomGesturesEnabled: false,
+                              scrollGesturesEnabled: false,
+                              tiltGesturesEnabled: false,
+                              rotateGesturesEnabled: false,
+                              initialCameraPosition: CameraPosition(
+                                target: vendorAddress!,
+                                zoom: 14.0,
+                              ),
+                              markers: {
+                                Marker(
+                                  markerId: MarkerId(widget.bookingBean.roomInfos!.hotelName!),
+                                  position: vendorAddress!,
+                                ),
+                              },
+                              myLocationEnabled: false,
+                              myLocationButtonEnabled: false,
                             ),
-                          },
-                          myLocationEnabled: false,
-                          myLocationButtonEnabled: false,
+                          ),
                         ),
-                      ),
+                        SizedBox(height: 10,),
+                        InkWell(
+                          borderRadius: BorderRadius.circular(50),
+                          onTap: () {
+                            FlutterPhoneDirectCaller.callNumber(
+                              _con.bookingDetailsData.hotelContentInfo!.mobileno!,
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(50),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.green.withOpacity(0.3),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.call,
+                              color: Colors.white,
+                              size: 22,
+                            ),
+                          ),
+                        )
+                      ],
                     ),
                   ],
                 ),
@@ -496,29 +530,38 @@ class _HotelMyBookingDetailsPageState extends StateMVC<HotelMyBookingDetailsPage
               ),
               SizedBox(height: 10,),
               if(_con.canCancel)
-              InkWell(
-                onTap: (){
-                  _con.cancelBooking(context, widget.bookingBean.id.toString());
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      "Cancel Booking",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                InkWell(
+                  onTap: () {
+                    showCancelReasonSheet(
+                      context,
+                      onSubmit: (reason) {
+                        _con.cancelBooking(
+                          context,
+                          widget.bookingBean.id.toString(),
+                          reason,
+                        );
+                      },
+                    );
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        "Cancel Booking",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              )
+                )
 
             ],
           ):Container()
@@ -526,6 +569,21 @@ class _HotelMyBookingDetailsPageState extends StateMVC<HotelMyBookingDetailsPage
       ),
     );
   }
+
+  void showCancelReasonSheet(
+      BuildContext context, {
+        required Function(String reason) onSubmit,
+      }) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return _CancelReasonSheet(onSubmit: onSubmit);
+      },
+    );
+  }
+
 
   Widget _buildInfoCard({
     required IconData icon,
@@ -604,3 +662,126 @@ class _HotelMyBookingDetailsPageState extends StateMVC<HotelMyBookingDetailsPage
 
 
 }
+
+class _CancelReasonSheet extends StatefulWidget {
+  final Function(String reason) onSubmit;
+
+  const _CancelReasonSheet({required this.onSubmit});
+
+  @override
+  State<_CancelReasonSheet> createState() => _CancelReasonSheetState();
+}
+
+class _CancelReasonSheetState extends State<_CancelReasonSheet> {
+  String? selectedReason;
+  final TextEditingController _otherController = TextEditingController();
+
+  final List<String> reasons = [
+    "Booked by mistake",
+    "Change of plans",
+    "Found a better option",
+    "Service delayed",
+    "Other",
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Handle
+          Center(
+            child: Container(
+              width: 50,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          const Text(
+            "Cancel Booking",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+
+          const SizedBox(height: 12),
+
+          ...reasons.map((reason) {
+            return RadioListTile<String>(
+              title: Text(reason),
+              value: reason,
+              groupValue: selectedReason,
+              onChanged: (value) {
+                setState(() => selectedReason = value);
+              },
+            );
+          }).toList(),
+
+          if (selectedReason == "Other")
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: TextField(
+                controller: _otherController,
+                decoration: const InputDecoration(
+                  hintText: "Enter reason",
+                ),
+              ),
+            ),
+
+          const SizedBox(height: 16),
+
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () {
+                if (selectedReason == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Please select a reason")),
+                  );
+                  return;
+                }
+
+                final reason = selectedReason == "Other"
+                    ? _otherController.text.trim()
+                    : selectedReason!;
+
+                if (reason.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Please enter a reason")),
+                  );
+                  return;
+                }
+
+                Navigator.pop(context);
+                widget.onSubmit(reason);
+              },
+              child: const Text(
+                "Submit Cancellation",
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

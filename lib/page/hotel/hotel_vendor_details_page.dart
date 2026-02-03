@@ -205,7 +205,7 @@ class _HotelVendorDetailsPageState extends StateMVC<HotelVendorDetailsPage> {
                   if(roomBean.hourlyPrices!.isNotEmpty) {
                     widget.bookingRequest.checkInDate = TimeUtils.convertddMMyyyy(roomBean.hourlyPrices![0].date!);
                     widget.bookingRequest.nights = roomBean.hourlyPrices!.length;
-                    widget.bookingRequest.price  = ((double.parse(roomBean.minPrice!).round() * (roomBean.hourlyPrices!.length))* widget.bookingRequest.rooms!);
+                    widget.bookingRequest.price  = ((roomBean.totalPrice!.round() * (roomBean.hourlyPrices!.length))* widget.bookingRequest.rooms!);
                     PageNavigation.gotoHotelRoomPage(
                         context, widget.hotelData, roomBean,
                         widget.bookingRequest);
@@ -473,7 +473,7 @@ class _HotelVendorDetailsPageState extends StateMVC<HotelVendorDetailsPage> {
                                   children: [
                                     if(roomBean.hourlyPrices!.isNotEmpty)
                                     Text(
-                                      "${ApiConstants.currency}${((double.parse(roomBean.minPrice!).round() * (roomBean.hourlyPrices!.length))* widget.bookingRequest.rooms!) ?? 0}",
+                                      "${ApiConstants.currency}${((roomBean.totalPrice!.round() * (roomBean.hourlyPrices!.length))* widget.bookingRequest.rooms!) ?? 0}",
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,

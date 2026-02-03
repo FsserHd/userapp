@@ -110,6 +110,7 @@ class Rooms {
   String? minPrice;
   String? maxPrice;
   int? adult;
+  int? totalPrice = 0;
   int? children;
   int? bathroom;
   int? numberOfRoomsOfThisSameType;
@@ -259,6 +260,7 @@ class HotelHourlyPrices {
   int? hourId;
   int? hour;
   int? price;
+  int? totalPrice = 0;
   String? createdAt;
   String? updatedAt;
   int? serialNumber;

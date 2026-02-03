@@ -181,6 +181,11 @@ class HotelController extends ControllerMVC{
     await apiService.getHotelDetails(hotelId,bookingRequest).then((value) async {
       Loader.hide();
       roomList = value.data!.rooms!;
+      for (var room in roomList) {
+        room.totalPrice = room.hourlyPrices
+            ?.fold(0, (sum, item) => sum! + (item.price ?? 0)) ??
+            0;
+      }
     }).catchError((e){
       print(e);
       Loader.hide();
